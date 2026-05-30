@@ -1273,3 +1273,60 @@ select option {
     padding: 10px;
     font-size: 12px;
 }
+
+/* Advanced Fine-Tuning and Keyboard Inline Editing Styles */
+.finetune-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.finetune-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: bold;
+    padding: 0px 4px;
+    border-radius: 3px;
+    cursor: pointer;
+    line-height: 1;
+    min-height: unset;
+    min-width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    user-select: none;
+}
+.finetune-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--text-main);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+.editable-val {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--accent-red);
+    padding: 0 4px;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+.editable-val:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+.editable-val-input {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--accent-red);
+    color: #fff;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    width: 55px;
+    text-align: center;
+    padding: 0px;
+    height: 14px;
+    border-radius: 2px;
+    outline: none;
+}

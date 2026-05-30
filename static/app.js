@@ -11,6 +11,7 @@ const state = {
     selectedDest: null,    // Feature for arrival
     mapLoaded: false,
     geojsonLoaded: false,
+    savedCalibration: null,
     
     // Animation Playback Parameters
     animation: {
@@ -1129,8 +1130,8 @@ function drawCountryBoundary(ctx, feature, fillColor, strokeColor, glowColor) {
     
     const time = Date.now();
     
-    // Shaded pulsing base fill opacity (gently oscillates using sine)
-    const pulseOpacity = 0.15 + 0.12 * Math.sin(time / 450);
+    // Shaded pulsing base fill opacity (gently oscillates using sine, unless recording is active)
+    const pulseOpacity = isRecording ? 0.15 : (0.15 + 0.12 * Math.sin(time / 450));
     ctx.fillStyle = fillColor.replace(/rgba?\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,\s*[\d\.]+)?\)/, `rgba($1, $2, $3, ${pulseOpacity})`);
     
     // Dynamic pulsing boundary glow
@@ -1140,7 +1141,7 @@ function drawCountryBoundary(ctx, feature, fillColor, strokeColor, glowColor) {
     
     if (glowColor) {
         ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 10 + 6 * Math.sin(time / 200); // outline pulses
+        ctx.shadowBlur = isRecording ? 10 : (10 + 6 * Math.sin(time / 200)); // outline pulses
     }
 
     const pathPolygon = (polygon) => {
@@ -1381,8 +1382,10 @@ function animateFrame(timestamp) {
         ctx.stroke();
         ctx.restore();
 
-        // Draw traveled route (solid glowing color theme line)
-        if (currentT > 0.001) {
+        const routeStyle = document.getElementById('trajectory-style')?.value || 'solid';
+
+        // Draw traveled route (glowing color theme line, style selectable)
+        if (currentT > 0.001 && routeStyle !== 'none') {
             ctx.save();
             ctx.beginPath();
             ctx.moveTo(p0.x, p0.y);
@@ -1396,12 +1399,24 @@ function animateFrame(timestamp) {
             ctx.lineWidth = 3.5 / state.camera.zoom;
             ctx.shadowColor = state.styles.trajectoryColorGlow;
             ctx.shadowBlur = 10;
+            
+            if (routeStyle === 'dashed') {
+                ctx.setLineDash([12 / state.camera.zoom, 8 / state.camera.zoom]);
+            } else if (routeStyle === 'dotted') {
+                ctx.setLineDash([2 / state.camera.zoom, 6 / state.camera.zoom]);
+                ctx.lineCap = 'round';
+            }
+            
             ctx.stroke();
             ctx.restore();
         }
 
+        const particlesEnabled = document.getElementById('particles-toggle')?.checked !== false;
+
         // Update & Render sparks engine trail
-        updateAndDrawParticles(ctx);
+        if (particlesEnabled) {
+            updateAndDrawParticles(ctx);
+        }
 
         // Calculate current tip coordinates and derivative flight angle
         const tipPt = getBezierPoint(p0, p1, p2, currentT);
@@ -1409,7 +1424,7 @@ function animateFrame(timestamp) {
         const angle = Math.atan2(deriv.y, deriv.x);
 
         // Spawn engine spark particles when playing
-        if (state.animation.isPlaying && currentT > 0 && currentT < 0.999) {
+        if (particlesEnabled && state.animation.isPlaying && currentT > 0 && currentT < 0.999) {
             spawnTrailParticles(tipPt.x, tipPt.y, angle, state.camera.zoom);
         }
 
@@ -2035,6 +2050,7 @@ function setupUIEventListeners() {
         
         // Browser localStorage fallback
         localStorage.setItem('aeroglide_calibration', JSON.stringify(payload));
+        state.savedCalibration = payload;
         
         // Write persistently to local JSON file calibration_settings.json via Flask server
         fetch('/api/save_calibration', {
@@ -2220,26 +2236,49 @@ function setupUIEventListeners() {
     // Wire up Auto-Align Outlines with Default Map Image Presets
     if (workspaceBtnAutoAlign) {
         workspaceBtnAutoAlign.addEventListener('click', () => {
-            // Snaps outlines layer calibration to optimal map matching preset
-            calibrationTarget.xOffset = 1920.0;
-            calibrationTarget.yOffset = 1070.0;
-            calibrationTarget.xScale = 10.6667;
-            calibrationTarget.yScale = 11.0000;
-            calibrationTarget.rotation = 0.0;
-            calibrationTarget.skewX = 0.0;
-            calibrationTarget.skewY = 0.0;
+            const source = state.savedCalibration || {
+                xOffset: 1920.0,
+                yOffset: 1070.0,
+                xScale: 10.6667,
+                yScale: 11.0000,
+                rotation: 0.0,
+                skewX: 0.0,
+                skewY: 0.0,
+                imageXOffset: 0.0,
+                imageYOffset: 0.0,
+                imageXScale: 1.0,
+                imageYScale: 1.0,
+                imageRotation: 0.0,
+                imageSkewX: 0.0,
+                imageSkewY: 0.0
+            };
 
-            // Snaps background map image layer calibration to default center values
-            imageCalibrationTarget.xOffset = 0.0;
-            imageCalibrationTarget.yOffset = 0.0;
-            imageCalibrationTarget.xScale = 1.0;
-            imageCalibrationTarget.yScale = 1.0;
-            imageCalibrationTarget.rotation = 0.0;
-            imageCalibrationTarget.skewX = 0.0;
-            imageCalibrationTarget.skewY = 0.0;
+            // Snaps outlines layer calibration
+            calibrationTarget.xOffset = source.xOffset;
+            calibrationTarget.yOffset = source.yOffset;
+            calibrationTarget.xScale = source.xScale;
+            calibrationTarget.yScale = source.yScale;
+            calibrationTarget.rotation = source.rotation !== undefined ? source.rotation : 0.0;
+            calibrationTarget.skewX = source.skewX !== undefined ? source.skewX : 0.0;
+            calibrationTarget.skewY = source.skewY !== undefined ? source.skewY : 0.0;
+
+            // Snaps background map image layer calibration
+            imageCalibrationTarget.xOffset = source.imageXOffset !== undefined ? source.imageXOffset : 0.0;
+            imageCalibrationTarget.yOffset = source.imageYOffset !== undefined ? source.imageYOffset : 0.0;
+            imageCalibrationTarget.xScale = source.imageXScale !== undefined ? source.imageXScale : 1.0;
+            imageCalibrationTarget.yScale = source.imageYScale !== undefined ? source.imageYScale : 1.0;
+            imageCalibrationTarget.rotation = source.imageRotation !== undefined ? source.imageRotation : 0.0;
+            imageCalibrationTarget.skewX = source.imageSkewX !== undefined ? source.imageSkewX : 0.0;
+            imageCalibrationTarget.skewY = source.imageSkewY !== undefined ? source.imageSkewY : 0.0;
 
             syncTransformToolbarUI();
-            showToast("Outlines automatically aligned with default map!");
+            
+            // Trigger sliders readouts update
+            const updateEvt = new Event('input');
+            const slXOff = document.getElementById('workspace-x-offset');
+            if (slXOff) slXOff.dispatchEvent(updateEvt);
+
+            showToast(state.savedCalibration ? "Map layers snapped to saved calibration preset!" : "Outlines aligned with default map presets!");
         });
     }
 
@@ -2339,6 +2378,101 @@ function setupUIEventListeners() {
     downloadBtn.addEventListener('click', () => {
         startCanvasRecording();
     });
+
+    // Advanced Calibration Fine-Tuning Buttons (+ and -)
+    document.querySelectorAll('.finetune-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const sliderId = btn.getAttribute('data-target');
+            const slider = document.getElementById(sliderId);
+            if (!slider) return;
+            
+            const isInc = btn.classList.contains('btn-inc');
+            const step = parseFloat(slider.getAttribute('step')) || 0.1;
+            const min = parseFloat(slider.getAttribute('min')) || -Infinity;
+            const max = parseFloat(slider.getAttribute('max')) || Infinity;
+            
+            let val = parseFloat(slider.value) || 0;
+            val = isInc ? (val + step) : (val - step);
+            
+            // Constrain
+            val = Math.max(min, Math.min(max, val));
+            
+            slider.value = val;
+            slider.dispatchEvent(new Event('input'));
+            slider.dispatchEvent(new Event('change'));
+        });
+    });
+
+    // Advanced Keyboard Inline Editing for Readouts
+    document.querySelectorAll('.editable-val').forEach(span => {
+        span.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (span.querySelector('input')) return; // Already editing
+            
+            const sliderId = span.getAttribute('data-target');
+            const slider = document.getElementById(sliderId);
+            if (!slider) return;
+            
+            const originalVal = parseFloat(slider.value) || 0;
+            const min = parseFloat(slider.getAttribute('min')) || -Infinity;
+            const max = parseFloat(slider.getAttribute('max')) || Infinity;
+            
+            // Create input
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'editable-val-input';
+            input.value = originalVal;
+            input.step = slider.getAttribute('step') || '0.1';
+            
+            // Replace span text with input
+            span.textContent = '';
+            span.appendChild(input);
+            input.focus();
+            input.select();
+            
+            const commit = () => {
+                let val = parseFloat(input.value);
+                if (isNaN(val)) {
+                    val = originalVal;
+                } else {
+                    val = Math.max(min, Math.min(max, val));
+                }
+                
+                // Remove input, restore text representation
+                if (span.contains(input)) {
+                    span.removeChild(input);
+                }
+                
+                // Set slider value and trigger events
+                slider.value = val;
+                slider.dispatchEvent(new Event('input'));
+                slider.dispatchEvent(new Event('change'));
+            };
+            
+            const cancel = () => {
+                if (span.contains(input)) {
+                    span.removeChild(input);
+                }
+                // Trigger sliders readouts update by dispatching input on the slider
+                slider.dispatchEvent(new Event('input'));
+            };
+            
+            input.addEventListener('keydown', (eKey) => {
+                if (eKey.key === 'Enter') {
+                    eKey.preventDefault();
+                    commit();
+                } else if (eKey.key === 'Escape') {
+                    eKey.preventDefault();
+                    cancel();
+                }
+            });
+            
+            input.addEventListener('blur', () => {
+                commit();
+            });
+        });
+    });
 }
 
 // --- Dynamic Canvas HTML5 Screen Recorder (MediaRecorder API) ---
@@ -2346,10 +2480,8 @@ function setupUIEventListeners() {
 function toggleUIControls(disable) {
     const inputs = [
         originInput, destInput, speedSlider, loopToggle, 
-        cameraLock, recenterBtn, focusFlightBtn, playBtn, 
-        resetBtn, timelineScrubber, themeSelect, zoomFramingSelect, 
-        downloadBtn, cameraZoomSlider, calXOffset, calYOffset, calXScale, 
-        calYScale, saveCalibrationBtn, outlineAllToggle
+        recenterBtn, focusFlightBtn, playBtn, 
+        resetBtn, timelineScrubber, downloadBtn
     ];
     inputs.forEach(el => {
         if (el) {
@@ -2385,11 +2517,30 @@ function startCanvasRecording() {
     state.animation.isPlaying = false;
     state.animation.progress = 0;
     state.animation.particles = [];
-    state.camera.lockToPath = true;
-    cameraLock.checked = true;
+    
+    // Keep user's actual camera lock preference!
+    const userLockSetting = cameraLock.checked;
+    state.camera.lockToPath = userLockSetting;
     
     // Recalculate zoom framing target inside 1920x1080 space
     focusOnFlightPath();
+
+    // Instantly snap the camera coordinates to eliminate starting panning lag/slip!
+    if (state.camera.lockToPath) {
+        const c1 = getCountryCentroid(state.selectedOrigin);
+        const p0 = projectCoords(c1[0], c1[1]);
+        state.camera.targetX = p0.x;
+        state.camera.targetY = p0.y;
+        state.camera.x = p0.x;
+        state.camera.y = p0.y;
+        state.camera.zoom = parseFloat(cameraZoomSlider.value) || 0.8;
+        state.camera.targetZoom = parseFloat(cameraZoomSlider.value) || 0.8;
+    } else {
+        // If not following, instantly snap to the midpoint overview
+        state.camera.x = state.camera.targetX;
+        state.camera.y = state.camera.targetY;
+        state.camera.zoom = state.camera.targetZoom;
+    }
 
     // A small buffer delay of 950ms to let the camera pan smoothly to starting coordinates
     setTimeout(() => {
@@ -2479,6 +2630,9 @@ function loadCalibrationSettings() {
             return res.json();
         })
         .then(data => {
+            // Cache saved settings for the Auto-Align preset
+            state.savedCalibration = data;
+
             // Load values to active target state
             calibrationTarget.xOffset = data.xOffset;
             calibrationTarget.yOffset = data.yOffset;

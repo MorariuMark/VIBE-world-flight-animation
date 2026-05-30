@@ -167,7 +167,7 @@
 
                 <!-- Customize Theme & Colors Card -->
                 <div class="section-card">
-                    <h2><span class="sec-icon">🎨</span> Customize Colors</h2>
+                    <h2><span class="sec-icon">🎨</span> Customize Styles</h2>
                     <div class="input-group">
                         <label for="color-theme">Map & Trajectory Theme</label>
                         <select id="color-theme">
@@ -177,6 +177,24 @@
                             <option value="amber">🟠 Solar Amber</option>
                             <option value="violet">💜 Cosmic Violet</option>
                         </select>
+                    </div>
+
+                    <div class="input-group" style="margin-top: 10px;">
+                        <label for="trajectory-style">Plane Trail Style</label>
+                        <select id="trajectory-style">
+                            <option value="solid" selected>⎯⎯ Solid Glow Line</option>
+                            <option value="dashed">--- Dashed Line</option>
+                            <option value="dotted">・・・ Dotted Line</option>
+                            <option value="none">❌ No Trail (Hidden)</option>
+                        </select>
+                    </div>
+
+                    <div class="toggle-group" style="margin-top: 12px; margin-bottom: 4px;">
+                        <label class="switch-container">
+                            <input type="checkbox" id="particles-toggle" checked>
+                            <span class="switch-slider"></span>
+                            <span class="toggle-label">Engine Spark Particles</span>
+                        </label>
                     </div>
                 </div>
 
@@ -248,7 +266,11 @@
                         <div class="input-group">
                             <div class="slider-header">
                                 <label for="workspace-x-offset">X Offset (Shift H)</label>
-                                <span id="val-workspace-x-offset">1920.0</span>
+                                <div class="finetune-control">
+                                    <button class="finetune-btn btn-dec" data-target="workspace-x-offset" title="Nudge Down">-</button>
+                                    <span id="val-workspace-x-offset" class="editable-val" data-target="workspace-x-offset">1920.0</span>
+                                    <button class="finetune-btn btn-inc" data-target="workspace-x-offset" title="Nudge Up">+</button>
+                                </div>
                             </div>
                             <input type="range" id="workspace-x-offset" min="-4000" max="8000" step="0.1" value="1920">
                         </div>
@@ -256,7 +278,11 @@
                         <div class="input-group">
                             <div class="slider-header">
                                 <label for="workspace-y-offset">Y Offset (Shift V)</label>
-                                <span id="val-workspace-y-offset">1070.0</span>
+                                <div class="finetune-control">
+                                    <button class="finetune-btn btn-dec" data-target="workspace-y-offset" title="Nudge Down">-</button>
+                                    <span id="val-workspace-y-offset" class="editable-val" data-target="workspace-y-offset">1070.0</span>
+                                    <button class="finetune-btn btn-inc" data-target="workspace-y-offset" title="Nudge Up">+</button>
+                                </div>
                             </div>
                             <input type="range" id="workspace-y-offset" min="-3000" max="6000" step="0.1" value="1070">
                         </div>
@@ -264,7 +290,11 @@
                         <div class="input-group">
                             <div class="slider-header">
                                 <label for="workspace-x-scale">X Scale (Stretch H)</label>
-                                <span id="val-workspace-x-scale">10.667</span>
+                                <div class="finetune-control">
+                                    <button class="finetune-btn btn-dec" data-target="workspace-x-scale" title="Contract">-</button>
+                                    <span id="val-workspace-x-scale" class="editable-val" data-target="workspace-x-scale">10.667</span>
+                                    <button class="finetune-btn btn-inc" data-target="workspace-x-scale" title="Stretch">+</button>
+                                </div>
                             </div>
                             <input type="range" id="workspace-x-scale" min="0.01" max="100.0" step="0.001" value="10.667">
                         </div>
@@ -272,7 +302,11 @@
                         <div class="input-group">
                             <div class="slider-header">
                                 <label for="workspace-y-scale">Y Scale (Stretch V)</label>
-                                <span id="val-workspace-y-scale">11.000</span>
+                                <div class="finetune-control">
+                                    <button class="finetune-btn btn-dec" data-target="workspace-y-scale" title="Contract">-</button>
+                                    <span id="val-workspace-y-scale" class="editable-val" data-target="workspace-y-scale">11.000</span>
+                                    <button class="finetune-btn btn-inc" data-target="workspace-y-scale" title="Stretch">+</button>
+                                </div>
                             </div>
                             <input type="range" id="workspace-y-scale" min="0.01" max="100.0" step="0.001" value="11.000">
                         </div>
@@ -281,7 +315,11 @@
                         <div class="input-group">
                             <div class="slider-header">
                                 <label for="workspace-rotation">Rotation Angle</label>
-                                <span id="val-workspace-rotation">0.0°</span>
+                                <div class="finetune-control">
+                                    <button class="finetune-btn btn-dec" data-target="workspace-rotation" title="Rotate Left">-</button>
+                                    <span id="val-workspace-rotation" class="editable-val" data-target="workspace-rotation">0.0°</span>
+                                    <button class="finetune-btn btn-inc" data-target="workspace-rotation" title="Rotate Right">+</button>
+                                </div>
                             </div>
                             <input type="range" id="workspace-rotation" min="-180" max="180" step="0.05" value="0">
                         </div>
@@ -289,7 +327,11 @@
                         <div class="input-group">
                             <div class="slider-header">
                                 <label for="workspace-skew-x">Skew X (Horizontal)</label>
-                                <span id="val-workspace-skew-x">0.0°</span>
+                                <div class="finetune-control">
+                                    <button class="finetune-btn btn-dec" data-target="workspace-skew-x" title="Skew Left">-</button>
+                                    <span id="val-workspace-skew-x" class="editable-val" data-target="workspace-skew-x">0.0°</span>
+                                    <button class="finetune-btn btn-inc" data-target="workspace-skew-x" title="Skew Right">+</button>
+                                </div>
                             </div>
                             <input type="range" id="workspace-skew-x" min="-45" max="45" step="0.05" value="0">
                         </div>
@@ -297,7 +339,11 @@
                         <div class="input-group">
                             <div class="slider-header">
                                 <label for="workspace-skew-y">Skew Y (Vertical)</label>
-                                <span id="val-workspace-skew-y">0.0°</span>
+                                <div class="finetune-control">
+                                    <button class="finetune-btn btn-dec" data-target="workspace-skew-y" title="Skew Down">-</button>
+                                    <span id="val-workspace-skew-y" class="editable-val" data-target="workspace-skew-y">0.0°</span>
+                                    <button class="finetune-btn btn-inc" data-target="workspace-skew-y" title="Skew Up">+</button>
+                                </div>
                             </div>
                             <input type="range" id="workspace-skew-y" min="-45" max="45" step="0.05" value="0">
                         </div>
