@@ -2379,10 +2379,12 @@ function setupUIEventListeners() {
         startCanvasRecording();
     });
 
-    // Advanced Calibration Fine-Tuning Buttons (+ and -)
+    // Advanced Calibration Fine-Tuning Buttons (+ and -) with Press-and-Hold Autorepeat
     document.querySelectorAll('.finetune-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
+        let repeatTimeout = null;
+        let repeatInterval = null;
+
+        const nudge = () => {
             const sliderId = btn.getAttribute('data-target');
             const slider = document.getElementById(sliderId);
             if (!slider) return;
@@ -2401,6 +2403,49 @@ function setupUIEventListeners() {
             slider.value = val;
             slider.dispatchEvent(new Event('input'));
             slider.dispatchEvent(new Event('change'));
+        };
+
+        const startRepeat = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Perform initial nudge
+            nudge();
+            
+            // Clear any existing timers just in case
+            cleanup();
+            
+            // Wait 400ms before starting rapid repeat
+            repeatTimeout = setTimeout(() => {
+                repeatInterval = setInterval(nudge, 40); // 40ms interval for fluid 25 nudges per second!
+            }, 400);
+        };
+
+        const cleanup = () => {
+            if (repeatTimeout) {
+                clearTimeout(repeatTimeout);
+                repeatTimeout = null;
+            }
+            if (repeatInterval) {
+                clearInterval(repeatInterval);
+                repeatInterval = null;
+            }
+        };
+
+        // Bind pointer events
+        btn.addEventListener('mousedown', startRepeat);
+        btn.addEventListener('mouseup', cleanup);
+        btn.addEventListener('mouseleave', cleanup);
+        
+        // Touch support for tablets/mobile
+        btn.addEventListener('touchstart', startRepeat, { passive: false });
+        btn.addEventListener('touchend', cleanup);
+        btn.addEventListener('touchcancel', cleanup);
+
+        // Click fallback as standard accessibility precaution (prevent double trigger)
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
         });
     });
 
