@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroGlide - Flight Path Animator</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- Interactive 4K Canvas -->
+        <canvas id="map-canvas"></canvas>
+
+        <!-- Glowing Real-Time Flight HUD (Bottom Left) -->
+        <div id="hud-display" class="hud-panel glass hidden">
+            <div class="hud-title">FLIGHT HUD - REAL-TIME TELEMETRY</div>
+            <div class="hud-grid">
+                <div class="hud-item">
+                    <span class="hud-label">DEPARTING</span>
+                    <span class="hud-value" id="hud-origin">-</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">DESTINATION</span>
+                    <span class="hud-value highlight" id="hud-dest">-</span>
+                </div>
+            </div>
+            <div class="hud-main-stat">
+                <span class="hud-label">REMAINING DISTANCE</span>
+                <span class="hud-value number" id="hud-dist">-</span>
+            </div>
+            <div class="hud-grid sub">
+                <div class="hud-item">
+                    <span class="hud-label">CURRENT HEADING</span>
+                    <span class="hud-value" id="hud-heading">-</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">FLIGHT SPEED</span>
+                    <span class="hud-value" id="hud-speed">850 km/h</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recording Status Overlay -->
+        <div id="recording-overlay" class="recording-banner hidden">
+            <div class="rec-dot"></div>
+            <span>RECORDING HIGH-RES VIDEO (EXPORTS CANVAS ONLY)... </span>
+            <span id="rec-progress">0%</span>
+        </div>
+
+        <!-- Premium Glassmorphic Sidebar -->
+        <div class="sidebar glass" id="sidebar-panel">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">✈</span>
+                    <h1>AeroGlide</h1>
+                </div>
+                <p class="subtitle">Interactive Flight Path Animator</p>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Country Selection Section -->
+                <div class="section-card">
+                    <h2><span class="sec-icon">🗺</span> Select Route</h2>
+                    
+                    <div class="input-group">
+                        <label for="origin-input">Origin Country</label>
+                        <div class="autocomplete-container">
+                            <input type="text" id="origin-input" placeholder="Search departure country..." autocomplete="off">
+                            <button id="clear-origin" class="clear-input-btn hidden">&times;</button>
+                            <div id="origin-suggestions" class="suggestions-dropdown hidden"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="destination-input">Destination Country</label>
+                        <div class="autocomplete-container">
+                            <input type="text" id="destination-input" placeholder="Search arrival country..." autocomplete="off">
+                            <button id="clear-destination" class="clear-input-btn hidden">&times;</button>
+                            <div id="destination-suggestions" class="suggestions-dropdown hidden"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flight Statistics (Revealed when route is loaded) -->
+                <div class="section-card hidden" id="stats-panel">
+                    <h2><span class="sec-icon">📊</span> Flight Details</h2>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Orthodromic Distance</span>
+                            <span class="stat-value" id="distance-val">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Estimated Flight Time</span>
+                            <span class="stat-value" id="duration-val">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Initial Heading</span>
+                            <span class="stat-value" id="heading-val">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Status</span>
+                            <span class="stat-value highlight" id="status-val">Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Playback & Control Section -->
+                <div class="section-card">
+                    <h2><span class="sec-icon">🎮</span> Animation Controls</h2>
+                    
+                    <!-- Playback Buttons -->
+                    <div class="control-row">
+                        <button id="play-btn" class="primary-btn" disabled>
+                            <span class="btn-icon">▶</span> Play
+                        </button>
+                        <button id="reset-btn" class="secondary-btn" disabled>
+                            <span class="btn-icon">↺</span> Reset
+                        </button>
+                    </div>
+
+                    <!-- Export Video Button -->
+                    <div class="control-row">
+                        <button id="download-btn" class="export-btn" disabled>
+                            <span class="btn-icon">📹</span> Export Video (No UI)
+                        </button>
+                    </div>
+
+                    <!-- Timeline Scrubber -->
+                    <div class="input-group timeline-group">
+                        <div class="slider-header">
+                            <label for="timeline-scrubber">Flight Progress</label>
+                            <span id="timeline-pct">0.0%</span>
+                        </div>
+                        <div class="timeline-slider-wrapper">
+                            <input type="range" id="timeline-scrubber" min="0" max="100" value="0" step="0.05" disabled>
+                            <div class="slider-track-fill" id="timeline-fill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Speed Control -->
+                    <div class="input-group">
+                        <div class="slider-header">
+                            <label for="speed-slider">Simulation Speed</label>
+                            <span id="speed-label">1.0x</span>
+                        </div>
+                        <input type="range" id="speed-slider" min="0.25" max="4.0" step="0.25" value="1.0">
+                    </div>
+
+                    <!-- Toggles -->
+                    <div class="toggle-group">
+                        <label class="switch-container">
+                            <input type="checkbox" id="loop-toggle" checked>
+                            <span class="switch-slider"></span>
+                            <span class="toggle-label">Auto-Loop Flight</span>
+                        </label>
+                        <label class="switch-container">
+                            <input type="checkbox" id="camera-lock" checked>
+                            <span class="switch-slider"></span>
+                            <span class="toggle-label">Lock Zoom to Path</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Customize Theme & Colors Card -->
+                <div class="section-card">
+                    <h2><span class="sec-icon">🎨</span> Customize Colors</h2>
+                    <div class="input-group">
+                        <label for="color-theme">Map & Trajectory Theme</label>
+                        <select id="color-theme">
+                            <option value="red" selected>🔥 Cyber Neon Red</option>
+                            <option value="cyan">⚡ Electric Cyan</option>
+                            <option value="emerald">🟢 Matrix Emerald</option>
+                            <option value="amber">🟠 Solar Amber</option>
+                            <option value="violet">💜 Cosmic Violet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Camera Shortcuts -->
+                <div class="section-card">
+                    <h2><span class="sec-icon">🎥</span> View Options</h2>
+                    
+                    <div class="input-group" style="margin-bottom: 12px;">
+                        <label for="zoom-framing">Camera Focus Zoom</label>
+                        <select id="zoom-framing">
+                            <option value="close">🔍 Close-up Focus (Tight)</option>
+                            <option value="balanced" selected>⚖️ Balanced Framing</option>
+                            <option value="wide">🌍 Wide Overview (Far)</option>
+                        </select>
+                    </div>
+
+                    <!-- Camera Zoom Slider (To zoom in/out of the plane) -->
+                    <div class="input-group" style="margin-bottom: 12px;" id="camera-zoom-slider-group">
+                        <div class="slider-header">
+                            <label for="camera-zoom-slider">Flight Camera Zoom Distance</label>
+                            <span id="camera-zoom-val">0.80x</span>
+                        </div>
+                        <input type="range" id="camera-zoom-slider" min="0.15" max="3.0" step="0.05" value="0.80">
+                    </div>
+
+                    <div class="toggle-group" style="margin-top: 4px; margin-bottom: 12px;">
+                        <label class="switch-container">
+                            <input type="checkbox" id="outline-all-toggle" checked>
+                            <span class="switch-slider"></span>
+                            <span class="toggle-label">Show All Country Outlines</span>
+                        </label>
+                    </div>
+
+                    <div class="btn-grid">
+                        <button id="recenter-btn" class="action-btn">
+                            <span class="action-icon">⌖</span> Recenter World
+                        </button>
+                        <button id="focus-countries-btn" class="action-btn" disabled>
+                            <span class="action-icon">🔍</span> Focus Flight
+                        </button>
+                    </div>
+                    <button id="open-calibration-btn" class="secondary-btn" style="margin-top: 8px; width: 100%; font-size: 12px; padding: 10px;">
+                        <span class="action-icon">🛠️</span> Align Map (Transform Mode)
+                    </button>
+                </div>
+
+                <!-- Premium Map Transform & Image Editor Studio -->
+                <div class="section-card" id="calibration-workspace-card">
+                    <h2><span class="sec-icon">🗺️</span> Map Workspace & Editor</h2>
+                    
+                    <!-- Segmented Layer Tabs -->
+                    <div class="layer-selector" style="display: flex; background: rgba(0, 0, 0, 0.4); padding: 4px; border-radius: 8px; border: 1px solid var(--glass-border); margin-bottom: 12px;">
+                        <button id="sidebar-btn-vector-layer" class="layer-tab active" style="flex: 1; padding: 8px; font-size: 11px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s;" title="Transform Outlines">
+                            🌐 Outlines
+                        </button>
+                        <button id="sidebar-btn-image-layer" class="layer-tab" style="flex: 1; padding: 8px; font-size: 11px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s;" title="Transform Map Image">
+                            🖼️ Map Image
+                        </button>
+                    </div>
+
+                    <!-- Active Layer Indicator -->
+                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between;">
+                        <span>Transforming Layer:</span>
+                        <span id="sidebar-active-layer-name" style="color: var(--accent-red); font-weight: 700; text-transform: uppercase;">Outlines</span>
+                    </div>
+
+                    <!-- Transform Sliders -->
+                    <div class="transform-sliders-group" style="display: flex; flex-direction: column; gap: 10px; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 12px;">
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-x-offset">X Offset (Shift H)</label>
+                                <span id="val-workspace-x-offset">1920.0</span>
+                            </div>
+                            <input type="range" id="workspace-x-offset" min="-4000" max="8000" step="0.1" value="1920">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-y-offset">Y Offset (Shift V)</label>
+                                <span id="val-workspace-y-offset">1070.0</span>
+                            </div>
+                            <input type="range" id="workspace-y-offset" min="-3000" max="6000" step="0.1" value="1070">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-x-scale">X Scale (Stretch H)</label>
+                                <span id="val-workspace-x-scale">10.667</span>
+                            </div>
+                            <input type="range" id="workspace-x-scale" min="0.01" max="100.0" step="0.001" value="10.667">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-y-scale">Y Scale (Stretch V)</label>
+                                <span id="val-workspace-y-scale">11.000</span>
+                            </div>
+                            <input type="range" id="workspace-y-scale" min="0.01" max="100.0" step="0.001" value="11.000">
+                        </div>
+
+                        <!-- Rotation & Skew (More Calibration Options!) -->
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-rotation">Rotation Angle</label>
+                                <span id="val-workspace-rotation">0.0°</span>
+                            </div>
+                            <input type="range" id="workspace-rotation" min="-180" max="180" step="0.05" value="0">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-skew-x">Skew X (Horizontal)</label>
+                                <span id="val-workspace-skew-x">0.0°</span>
+                            </div>
+                            <input type="range" id="workspace-skew-x" min="-45" max="45" step="0.05" value="0">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-skew-y">Skew Y (Vertical)</label>
+                                <span id="val-workspace-skew-y">0.0°</span>
+                            </div>
+                            <input type="range" id="workspace-skew-y" min="-45" max="45" step="0.05" value="0">
+                        </div>
+
+                        <!-- Proportional scaling aspect lock toggle -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                            <span style="font-size: 11px; color: var(--text-muted);">Aspect Ratio Lock</span>
+                            <button id="workspace-btn-aspect-lock" class="aspect-lock-btn active" style="padding: 4px 8px; font-size: 10px; border-radius: 4px; display: inline-flex;" title="Lock Aspect Ratio">
+                                🔗 Locked
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Photoshop-grade Transform Presets (Only visible in Picture Workspace) -->
+                    <div id="workspace-presets-group" style="display: flex; flex-direction: column; gap: 8px; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 12px;">
+                        <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Transform Presets</span>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                            <button id="btn-preset-100" class="secondary-btn" style="padding: 6px; font-size: 10px; margin: 0; min-height: unset; line-height: 1.2;" title="Reset to 100% Size">100% Size</button>
+                            <button id="btn-preset-200" class="secondary-btn" style="padding: 6px; font-size: 10px; margin: 0; min-height: unset; line-height: 1.2;" title="Double to 200% Size">2x Size</button>
+                            <button id="btn-preset-center" class="secondary-btn" style="padding: 6px; font-size: 10px; margin: 0; min-height: unset; line-height: 1.2;" title="Center Picture">Center</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                            <button id="btn-preset-flip-h" class="secondary-btn" style="padding: 6px; font-size: 10px; margin: 0; min-height: unset; line-height: 1.2;" title="Flip Horizontally">↔ Flip H</button>
+                            <button id="btn-preset-flip-v" class="secondary-btn" style="padding: 6px; font-size: 10px; margin: 0; min-height: unset; line-height: 1.2;" title="Flip Vertically">↕ Flip V</button>
+                        </div>
+                    </div>
+
+                    <!-- Dedicated Map Picture Adjustments Section (Always Visible for direct editing!) -->
+                    <div class="image-adjustments-group" id="workspace-image-adjustments-group" style="display: flex; flex-direction: column; gap: 10px; border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 12px;">
+                        <h3 style="font-size: 12px; font-family: var(--font-heading); color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                            <span>🖼️</span> Background Map Adjustments
+                        </h3>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-brightness">Brightness</label>
+                                <span id="val-workspace-brightness">100%</span>
+                            </div>
+                            <input type="range" id="workspace-brightness" min="0" max="300" value="100" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-contrast">Contrast</label>
+                                <span id="val-workspace-contrast">100%</span>
+                            </div>
+                            <input type="range" id="workspace-contrast" min="0" max="300" value="100" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-saturation">Saturation</label>
+                                <span id="val-workspace-saturation">100%</span>
+                            </div>
+                            <input type="range" id="workspace-saturation" min="0" max="300" value="100" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-opacity">Opacity (Alpha)</label>
+                                <span id="val-workspace-opacity">100%</span>
+                            </div>
+                            <input type="range" id="workspace-opacity" min="0" max="100" value="100" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-blur">Blur Focus</label>
+                                <span id="val-workspace-blur">0px</span>
+                            </div>
+                            <input type="range" id="workspace-blur" min="0" max="20" value="0" step="0.5">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-hue">Hue Rotate</label>
+                                <span id="val-workspace-hue">0°</span>
+                            </div>
+                            <input type="range" id="workspace-hue" min="0" max="360" value="0" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-grayscale">Grayscale</label>
+                                <span id="val-workspace-grayscale">0%</span>
+                            </div>
+                            <input type="range" id="workspace-grayscale" min="0" max="100" value="0" step="1">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="slider-header">
+                                <label for="workspace-invert">Invert Colors</label>
+                                <span id="val-workspace-invert">0%</span>
+                            </div>
+                            <input type="range" id="workspace-invert" min="0" max="100" value="0" step="1">
+                        </div>
+
+                        <button id="workspace-btn-reset-effects" class="secondary-btn" style="padding: 8px; font-size: 11px; width: 100%;">
+                            ↺ Reset Map Picture adjustments
+                        </button>
+                        
+                        <!-- Dynamic Custom Background Map Image Uploader -->
+                        <div style="margin-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 10px;">
+                            <input type="file" id="workspace-map-upload" accept="image/*" style="display: none;">
+                            <button id="workspace-btn-upload-map" class="secondary-btn" style="padding: 10px; font-size: 11px; width: 100%; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--accent-red-dim);" title="Upload Custom Map Image">
+                                🖼️ Change Background Map Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Persistence Controls -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button id="workspace-btn-auto-align" class="primary-btn" style="padding: 12px; font-size: 13px; width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" title="Auto-Align Outlines with Default Map">
+                            ⚡ Auto-Align Outlines & Map
+                        </button>
+                        <button id="workspace-btn-save" class="primary-btn" style="padding: 12px; font-size: 13px; width: 100%;">
+                            💾 Save Calibration & Effects to Disk
+                        </button>
+                        <button id="workspace-btn-reset-layout" class="secondary-btn" style="padding: 10px; font-size: 12px; width: 100%;">
+                            ↺ Reset Layout Translations
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer info -->
+            <div class="sidebar-footer">
+                <p>Drag map to Pan • Scroll to Zoom</p>
+                <p class="copyright">AeroGlide v1.0 • Built with HTML5 Canvas</p>
+            </div>
+        </div>
+
+        <!-- Photoshop-style Boundary & Map Transform Studio Toolbar -->
+        <div id="calibration-toolbar" class="glass transform-panel floating-panel hidden">
+            <div class="toolbar-header">
+                <div class="toolbar-title-wrap">
+                    <span class="toolbar-icon">🛠️</span>
+                    <span class="toolbar-title">Map Transform Studio</span>
+                </div>
+                <button id="close-calibration-btn" class="close-btn">&times;</button>
+            </div>
+            
+            <div class="toolbar-body">
+                <!-- Layer Tab Selector -->
+                <div class="layer-selector-card" style="margin-bottom: 4px;">
+                    <div class="layer-selector" style="display: flex; background: rgba(0, 0, 0, 0.4); padding: 4px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                        <button id="btn-select-vector-layer" class="layer-tab active" style="flex: 1; padding: 8px; font-size: 11px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s;" title="Transform Country Outlines (🌐)">
+                            <span class="tab-icon">🌐</span> Outlines
+                        </button>
+                        <button id="btn-select-image-layer" class="layer-tab" style="flex: 1; padding: 8px; font-size: 11px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s;" title="Transform Map Image (🖼️)">
+                            <span class="tab-icon">🖼️</span> Map Image
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Move Section -->
+                <div class="tool-section">
+                    <div class="tool-section-title">Move Layer (Shift)</div>
+                    <div class="dpad-container">
+                        <button class="dpad-btn dpad-up" id="btn-nudge-up" title="Nudge Up (ArrowUp)">▲</button>
+                        <div class="dpad-middle">
+                            <button class="dpad-btn dpad-left" id="btn-nudge-left" title="Nudge Left (ArrowLeft)">◀</button>
+                            <span class="dpad-center">✥</span>
+                            <button class="dpad-btn dpad-right" id="btn-nudge-right" title="Nudge Right (ArrowRight)">▶</button>
+                        </div>
+                        <button class="dpad-btn dpad-down" id="btn-nudge-down" title="Nudge Down (ArrowDown)">▼</button>
+                    </div>
+                    <div class="val-display-grid">
+                        <div class="val-item">X: <span id="toolbar-val-x">1920.0</span></div>
+                        <div class="val-item">Y: <span id="toolbar-val-y">1070.0</span></div>
+                    </div>
+                </div>
+
+                <!-- Scale / Stretch Section -->
+                <div class="tool-section">
+                    <div class="tool-section-title" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                        <span>Stretch & Scale Layer</span>
+                        <button id="btn-aspect-lock" class="aspect-lock-btn active" title="Lock Aspect Ratio">
+                            <span class="lock-icon">🔗</span>
+                        </button>
+                    </div>
+                    
+                    <div class="stretch-controls-grid">
+                        <div class="stretch-row">
+                            <span class="stretch-label">Width (X):</span>
+                            <div class="btn-group">
+                                <button class="small-adjust-btn" id="btn-stretch-x-dec" title="Contract Width (A)">-</button>
+                                <button class="small-adjust-btn" id="btn-stretch-x-inc" title="Stretch Width (D)">+</button>
+                            </div>
+                        </div>
+                        <div class="stretch-row">
+                            <span class="stretch-label">Height (Y):</span>
+                            <div class="btn-group">
+                                <button class="small-adjust-btn" id="btn-stretch-y-dec" title="Contract Height (S)">-</button>
+                                <button class="small-adjust-btn" id="btn-stretch-y-inc" title="Stretch Height (W)">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group" style="margin-top: 10px;">
+                        <div class="slider-header" style="font-size: 11px;">
+                            <label for="proportional-zoom-slider">Proportional Zoom</label>
+                            <span id="proportional-zoom-val">100.0%</span>
+                        </div>
+                        <input type="range" id="proportional-zoom-slider" min="10" max="1000" value="100" step="0.1" style="height: 4px;">
+                    </div>
+                    
+                    <div class="val-display-grid" style="margin-top: 8px;">
+                        <div class="val-item">W: <span id="toolbar-val-xs">10.667</span></div>
+                        <div class="val-item">H: <span id="toolbar-val-ys">11.000</span></div>
+                    </div>
+                </div>
+
+                <!-- Background Image Effects Section -->
+                <div class="tool-section" id="image-effects-section">
+                    <div class="tool-section-title">🖼️ Background Image Adjustments</div>
+                    
+                    <div class="input-group">
+                        <div class="slider-header" style="font-size: 11px;">
+                            <label for="effect-brightness">Brightness</label>
+                            <span id="val-brightness">100%</span>
+                        </div>
+                        <input type="range" id="effect-brightness" min="0" max="300" value="100" step="1" style="height: 4px;">
+                    </div>
+
+                    <div class="input-group" style="margin-top: 6px;">
+                        <div class="slider-header" style="font-size: 11px;">
+                            <label for="effect-contrast">Contrast</label>
+                            <span id="val-contrast">100%</span>
+                        </div>
+                        <input type="range" id="effect-contrast" min="0" max="300" value="100" step="1" style="height: 4px;">
+                    </div>
+
+                    <div class="input-group" style="margin-top: 6px;">
+                        <div class="slider-header" style="font-size: 11px;">
+                            <label for="effect-saturation">Saturation</label>
+                            <span id="val-saturation">100%</span>
+                        </div>
+                        <input type="range" id="effect-saturation" min="0" max="300" value="100" step="1" style="height: 4px;">
+                    </div>
+
+                    <div class="input-group" style="margin-top: 6px;">
+                        <div class="slider-header" style="font-size: 11px;">
+                            <label for="effect-opacity">Opacity</label>
+                            <span id="val-opacity">100%</span>
+                        </div>
+                        <input type="range" id="effect-opacity" min="0" max="100" value="100" step="1" style="height: 4px;">
+                    </div>
+
+                    <div class="input-group" style="margin-top: 6px;">
+                        <div class="slider-header" style="font-size: 11px;">
+                            <label for="effect-blur">Blur</label>
+                            <span id="val-blur">0px</span>
+                        </div>
+                        <input type="range" id="effect-blur" min="0" max="20" value="0" step="0.5" style="height: 4px;">
+                    </div>
+
+                    <div class="input-group" style="margin-top: 6px;">
+                        <div class="slider-header" style="font-size: 11px;">
+                            <label for="effect-hue">Hue Rotate</label>
+                            <span id="val-hue">0°</span>
+                        </div>
+                        <input type="range" id="effect-hue" min="0" max="360" value="0" step="1" style="height: 4px;">
+                    </div>
+                    
+                    <button id="btn-reset-effects" class="secondary-btn" style="margin-top: 4px; padding: 6px; font-size: 10px; width: 100%;">
+                        ↺ Reset Image Adjustments
+                    </button>
+                </div>
+
+                <!-- Keyboard Hotkeys HUD -->
+                <div class="tool-section keyboard-hud">
+                    <div class="tool-section-title">Photoshop Hotkey Feedback</div>
+                    <div class="keyboard-hud-grid">
+                        <div class="keyboard-layout">
+                            <div class="key-row">
+                                <div class="kbd key-cap key-w">W</div>
+                            </div>
+                            <div class="key-row">
+                                <div class="kbd key-cap key-a">A</div>
+                                <div class="kbd key-cap key-s">S</div>
+                                <div class="kbd key-cap key-d">D</div>
+                            </div>
+                        </div>
+                        <div class="keyboard-arrows">
+                            <div class="key-row">
+                                <div class="kbd key-cap key-arrowup">▲</div>
+                            </div>
+                            <div class="key-row">
+                                <div class="kbd key-cap key-arrowleft">◀</div>
+                                <div class="kbd key-cap key-arrowdown">▼</div>
+                                <div class="kbd key-cap key-arrowright">▶</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="hotkey-tip">Active Layer: <span id="active-layer-indicator" style="color:var(--accent-red); font-weight:600; text-transform:uppercase;">Outlines</span></p>
+                    <p class="hotkey-tip" style="margin-top:2px;">Hold <b>Shift</b> to nudge x10 faster</p>
+                </div>
+            </div>
+            
+            <div class="toolbar-footer">
+                <button id="toolbar-save-btn" class="primary-btn save-btn">
+                    💾 Save Settings to Disk
+                </button>
+                <button id="toolbar-done-btn" class="secondary-btn done-btn">
+                    Let's Fly! ✈
+                </button>
+            </div>
+        </div>
+
+        <!-- Notification Banner -->
+        <div id="notification-banner" class="toast hidden">
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <!-- Script Entry Point -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
