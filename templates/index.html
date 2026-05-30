@@ -512,8 +512,22 @@
                         <button class="dpad-btn dpad-down" id="btn-nudge-down" title="Nudge Down (ArrowDown)">▼</button>
                     </div>
                     <div class="val-display-grid">
-                        <div class="val-item">X: <span id="toolbar-val-x">1920.0</span></div>
-                        <div class="val-item">Y: <span id="toolbar-val-y">1070.0</span></div>
+                        <div class="val-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>X:</span>
+                            <div class="finetune-control">
+                                <button class="finetune-btn btn-dec" data-target="workspace-x-offset" title="Nudge Down">-</button>
+                                <span id="toolbar-val-x" class="editable-val" data-target="workspace-x-offset">1920.0</span>
+                                <button class="finetune-btn btn-inc" data-target="workspace-x-offset" title="Nudge Up">+</button>
+                            </div>
+                        </div>
+                        <div class="val-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Y:</span>
+                            <div class="finetune-control">
+                                <button class="finetune-btn btn-dec" data-target="workspace-y-offset" title="Nudge Down">-</button>
+                                <span id="toolbar-val-y" class="editable-val" data-target="workspace-y-offset">1070.0</span>
+                                <button class="finetune-btn btn-inc" data-target="workspace-y-offset" title="Nudge Up">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -552,8 +566,22 @@
                     </div>
                     
                     <div class="val-display-grid" style="margin-top: 8px;">
-                        <div class="val-item">W: <span id="toolbar-val-xs">10.667</span></div>
-                        <div class="val-item">H: <span id="toolbar-val-ys">11.000</span></div>
+                        <div class="val-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>W:</span>
+                            <div class="finetune-control">
+                                <button class="finetune-btn btn-dec" data-target="workspace-x-scale" title="Contract">-</button>
+                                <span id="toolbar-val-xs" class="editable-val" data-target="workspace-x-scale">10.667</span>
+                                <button class="finetune-btn btn-inc" data-target="workspace-x-scale" title="Stretch">+</button>
+                            </div>
+                        </div>
+                        <div class="val-item" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>H:</span>
+                            <div class="finetune-control">
+                                <button class="finetune-btn btn-dec" data-target="workspace-y-scale" title="Contract">-</button>
+                                <span id="toolbar-val-ys" class="editable-val" data-target="workspace-y-scale">11.000</span>
+                                <button class="finetune-btn btn-inc" data-target="workspace-y-scale" title="Stretch">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
