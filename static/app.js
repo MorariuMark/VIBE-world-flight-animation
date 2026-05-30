@@ -12,6 +12,7 @@ const state = {
     mapLoaded: false,
     geojsonLoaded: false,
     savedCalibration: null,
+    routeStops: [null, null],
     
     // Animation Playback Parameters
     animation: {
@@ -166,13 +167,13 @@ const mapImg = new Image();
 const planeImg = new Image();
 planeImg.src = '/static/airplane.png';
 
-// UI Control Queries
-const originInput = document.getElementById('origin-input');
-const destInput = document.getElementById('destination-input');
-const originDropdown = document.getElementById('origin-suggestions');
-const destDropdown = document.getElementById('destination-suggestions');
-const clearOriginBtn = document.getElementById('clear-origin');
-const clearDestBtn = document.getElementById('clear-destination');
+// UI Control Queries (Replaced by dynamic Stops Timeline layout)
+const originInput = null;
+const destInput = null;
+const originDropdown = null;
+const destDropdown = null;
+const clearOriginBtn = null;
+const clearDestBtn = null;
 
 const playBtn = document.getElementById('play-btn');
 const resetBtn = document.getElementById('reset-btn');
@@ -786,12 +787,11 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
 }
 
-// --- Autocomplete Search Inputs Engine ---
+// --- Dynamic Autocomplete Search Inputs & Dynamic Stops Timeline ---
 
-function setupAutocomplete() {
-    const handleInput = (inputEl, dropdownEl, clearBtn) => {
+function bindAutocompleteToInput(inputEl, dropdownEl, clearBtn, index) {
+    const handleInput = () => {
         const query = inputEl.value.trim().toLowerCase();
-        
         if (query.length > 0) {
             clearBtn.classList.remove('hidden');
         } else {
@@ -801,6 +801,8 @@ function setupAutocomplete() {
         if (query.length < 1) {
             dropdownEl.innerHTML = '';
             dropdownEl.classList.add('hidden');
+            state.routeStops[index] = null;
+            routeUpdated();
             return;
         }
 
@@ -830,12 +832,7 @@ function setupAutocomplete() {
                 inputEl.value = name;
                 dropdownEl.classList.add('hidden');
                 
-                if (inputEl === originInput) {
-                    state.selectedOrigin = country;
-                } else {
-                    state.selectedDest = country;
-                }
-                
+                state.routeStops[index] = country;
                 routeUpdated();
             });
             dropdownEl.appendChild(item);
@@ -843,67 +840,159 @@ function setupAutocomplete() {
         dropdownEl.classList.remove('hidden');
     };
 
-    originInput.addEventListener('input', () => handleInput(originInput, originDropdown, clearOriginBtn));
-    destInput.addEventListener('input', () => handleInput(destInput, destDropdown, clearDestBtn));
+    inputEl.addEventListener('input', handleInput);
 
-    // Clear Button Operations
-    clearOriginBtn.addEventListener('click', () => {
-        originInput.value = '';
-        state.selectedOrigin = null;
-        clearOriginBtn.classList.add('hidden');
-        originDropdown.classList.add('hidden');
+    clearBtn.addEventListener('click', () => {
+        inputEl.value = '';
+        state.routeStops[index] = null;
+        clearBtn.classList.add('hidden');
+        dropdownEl.classList.add('hidden');
         routeUpdated();
     });
 
-    clearDestBtn.addEventListener('click', () => {
-        destInput.value = '';
-        state.selectedDest = null;
-        clearDestBtn.classList.add('hidden');
-        destDropdown.classList.add('hidden');
-        routeUpdated();
-    });
-
-    // Close suggestion boxes when clicking outside
+    // Close suggestions on outside click
     document.addEventListener('click', (e) => {
-        if (!originInput.contains(e.target) && !originDropdown.contains(e.target)) {
-            originDropdown.classList.add('hidden');
-        }
-        if (!destInput.contains(e.target) && !destDropdown.contains(e.target)) {
-            destDropdown.classList.add('hidden');
+        if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
+            dropdownEl.classList.add('hidden');
         }
     });
 }
 
-// --- Flight Path Logic and Geometry ---
+function renderRouteStops() {
+    const listContainer = document.getElementById('route-stops-list');
+    if (!listContainer) return;
 
-/**
- * Handle updates when origin/destination selection changes
- */
-function routeUpdated() {
-    if (state.selectedOrigin && state.selectedDest) {
-        if (state.selectedOrigin === state.selectedDest) {
-            showToast("Departure and arrival countries must be different!");
-            state.selectedDest = null;
-            destInput.value = '';
-            clearDestBtn.classList.add('hidden');
-            disableFlightControls();
-            return;
+    listContainer.innerHTML = '';
+    
+    state.routeStops.forEach((stopFeature, i) => {
+        const name = stopFeature ? (stopFeature.properties.NAME || stopFeature.properties.ADMIN || '') : '';
+        
+        let labelText = '';
+        if (i === 0) {
+            labelText = '🛫 1. Departure Origin';
+        } else if (i === state.routeStops.length - 1) {
+            labelText = `🛬 ${i + 1}. Final Destination`;
+        } else {
+            labelText = `📍 ${i + 1}. Intermediate Stop`;
         }
 
-        // Calculate and Show details
-        const c1 = getCountryCentroid(state.selectedOrigin);
-        const c2 = getCountryCentroid(state.selectedDest);
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'input-group';
+        itemDiv.style.position = 'relative';
+
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'slider-header';
+        headerDiv.style.fontSize = '11px';
+        headerDiv.style.marginBottom = '2px';
+        headerDiv.style.display = 'flex';
+        headerDiv.style.justifyContent = 'space-between';
+        headerDiv.style.alignItems = 'center';
+
+        const label = document.createElement('label');
+        label.textContent = labelText;
+        headerDiv.appendChild(label);
+
+        // Allow removal if we have more than 2 stops
+        if (state.routeStops.length > 2) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-stop-btn';
+            removeBtn.innerHTML = '❌ Remove';
+            removeBtn.style.background = 'transparent';
+            removeBtn.style.border = 'none';
+            removeBtn.style.color = 'var(--text-dimmed)';
+            removeBtn.style.fontSize = '10px';
+            removeBtn.style.cursor = 'pointer';
+            removeBtn.style.padding = '0';
+            removeBtn.style.margin = '0';
+            removeBtn.style.minHeight = 'unset';
+            removeBtn.style.display = 'inline-flex';
+            removeBtn.style.alignItems = 'center';
+            
+            removeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                state.routeStops.splice(i, 1);
+                renderRouteStops();
+                routeUpdated();
+            });
+            headerDiv.appendChild(removeBtn);
+        }
+
+        itemDiv.appendChild(headerDiv);
+
+        const autocompleteContainer = document.createElement('div');
+        autocompleteContainer.className = 'autocomplete-container';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'stop-input';
+        input.placeholder = 'Search country...';
+        input.value = name;
+        autocompleteContainer.appendChild(input);
+
+        const clearBtn = document.createElement('button');
+        clearBtn.className = `clear-input-btn ${name ? '' : 'hidden'}`;
+        clearBtn.innerHTML = '&times;';
+        autocompleteContainer.appendChild(clearBtn);
+
+        const suggestionsDropdown = document.createElement('div');
+        suggestionsDropdown.className = 'suggestions-dropdown hidden';
+        autocompleteContainer.appendChild(suggestionsDropdown);
+
+        itemDiv.appendChild(autocompleteContainer);
+        listContainer.appendChild(itemDiv);
+
+        bindAutocompleteToInput(input, suggestionsDropdown, clearBtn, i);
+    });
+}
+
+function setupAutocomplete() {
+    renderRouteStops();
+}
+
+/**
+ * Handle updates when any route stops change
+ */
+function routeUpdated() {
+    const activeStops = state.routeStops.filter(s => s !== null);
+
+    if (activeStops.length >= 2) {
+        // Validate that consecutive stops are not identical
+        for (let i = 0; i < activeStops.length - 1; i++) {
+            if (activeStops[i] === activeStops[i + 1]) {
+                showToast("Consecutive route stops must be different countries!");
+                // Clear the latter stop
+                const firstOccurIdx = state.routeStops.indexOf(activeStops[i + 1]);
+                const lastOccurIdx = state.routeStops.lastIndexOf(activeStops[i + 1]);
+                const clearIdx = (firstOccurIdx === i) ? lastOccurIdx : firstOccurIdx;
+                if (clearIdx !== -1) {
+                    state.routeStops[clearIdx] = null;
+                }
+                renderRouteStops();
+                disableFlightControls();
+                return;
+            }
+        }
+
+        // Calculate cumulative distance across all active legs
+        let cumulativeDist = 0;
+        for (let i = 0; i < activeStops.length - 1; i++) {
+            const c1 = getCountryCentroid(activeStops[i]);
+            const c2 = getCountryCentroid(activeStops[i + 1]);
+            cumulativeDist += calculateDistance(c1[0], c1[1], c2[0], c2[1]);
+        }
+        totalDistance = cumulativeDist;
+
+        // Compass heading of the first leg segment
+        const cStart = getCountryCentroid(activeStops[0]);
+        const cNext = getCountryCentroid(activeStops[1]);
+        const heading = calculateHeading(cStart[0], cStart[1], cNext[0], cNext[1]);
         
-        const dist = calculateDistance(c1[0], c1[1], c2[0], c2[1]);
-        totalDistance = dist;
-        const heading = calculateHeading(c1[0], c1[1], c2[0], c2[1]);
-        
-        // Speed estimate: Standard commercial jet (850 km/h) + 0.5 hour taxiing
-        const hrs = (dist / 850) + 0.5;
+        // Flight time estimate: Standard commercial jet (850 km/h) + 0.5 hour taxi/stopover per leg
+        const hrs = (totalDistance / 850) + 0.5 * (activeStops.length - 1);
         const hPart = Math.floor(hrs);
         const mPart = Math.round((hrs - hPart) * 60);
 
-        const distStr = `${Math.round(dist).toLocaleString()} km`;
+        const distStr = `${Math.round(totalDistance).toLocaleString()} km`;
         const headingStr = `${Math.round(heading)}° (${getCompassDirection(heading)})`;
 
         distanceVal.textContent = distStr;
@@ -912,16 +1001,16 @@ function routeUpdated() {
         statusVal.textContent = "Ready";
         statsPanel.classList.remove('hidden');
 
-        // Update glowing HUD telemetry overlays (Bottom Left)
-        const name1 = state.selectedOrigin.properties.NAME || state.selectedOrigin.properties.ADMIN;
-        const name2 = state.selectedDest.properties.NAME || state.selectedDest.properties.ADMIN;
+        // Update glowing HUD overlays (Bottom Left)
+        const name1 = activeStops[0].properties.NAME || activeStops[0].properties.ADMIN;
+        const name2 = activeStops[activeStops.length - 1].properties.NAME || activeStops[activeStops.length - 1].properties.ADMIN;
         hudOrigin.textContent = name1.toUpperCase();
         hudDest.textContent = name2.toUpperCase();
         hudDist.textContent = distStr;
         hudHeading.textContent = headingStr;
         hudPanel.classList.remove('hidden');
 
-        // Enable Playback Buttons
+        // Enable Playback Controls
         playBtn.removeAttribute('disabled');
         resetBtn.removeAttribute('disabled');
         downloadBtn.removeAttribute('disabled');
@@ -934,7 +1023,7 @@ function routeUpdated() {
         
         updateScrubberUI();
 
-        // Lock camera and focus on the flight path
+        // Focus camera on the dynamic bounds
         if (state.camera.lockToPath) {
             focusOnFlightPath();
         }
@@ -965,30 +1054,33 @@ function getCompassDirection(heading) {
 }
 
 /**
- * Frame camera bounds to fit both selected centroids perfectly, respecting zoom focus options
+ * Fit the camera viewport bounds enclosing all active stop centroids perfectly
  */
 function focusOnFlightPath() {
-    if (!state.selectedOrigin || !state.selectedDest) return;
+    const activeStops = state.routeStops.filter(s => s !== null);
+    if (activeStops.length < 2) return;
 
-    const c1 = getCountryCentroid(state.selectedOrigin);
-    const c2 = getCountryCentroid(state.selectedDest);
-    
-    const p1 = projectCoords(c1[0], c1[1]);
-    const p2 = projectCoords(c2[0], c2[1]);
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
-    // Midpoint coordinate
-    const cx = (p1.x + p2.x) / 2;
-    const cy = (p1.y + p2.y) / 2;
+    activeStops.forEach(stop => {
+        const centroid = getCountryCentroid(stop);
+        const p = projectCoords(centroid[0], centroid[1]);
+        if (p.x < minX) minX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y > maxY) maxY = p.y;
+    });
 
-    // Boundary box sizes
-    const dx = Math.abs(p2.x - p1.x);
-    const dy = Math.abs(p2.y - p1.y);
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
 
-    // Zoom framing select configuration
+    const dx = Math.abs(maxX - minX);
+    const dy = Math.abs(maxY - minY);
+
     const framingVal = zoomFramingSelect.value;
     let marginScale = 1.6; // balanced default
     if (framingVal === 'close') {
-        marginScale = 1.0; // tight zoom close-up
+        marginScale = 1.1; // tight zoom close-up
     } else if (framingVal === 'wide') {
         marginScale = 2.5; // far-out overview
     }
@@ -996,17 +1088,15 @@ function focusOnFlightPath() {
     const zoomX = canvas.width / (dx * marginScale || 500);
     const zoomY = canvas.height / (dy * marginScale || 500);
     
-    // Smooth target coordinates
     state.camera.targetX = cx;
     state.camera.targetY = cy;
     
-    // Bounds of focus zoom
-    const minZ = 0.15;
+    const minZ = 0.12;
     const maxZ = framingVal === 'close' ? 2.5 : 1.8;
     const computedZoom = Math.max(minZ, Math.min(maxZ, Math.min(zoomX, zoomY)));
     state.camera.targetZoom = computedZoom;
 
-    // Sync camera zoom follow slider value to match active zoom framing
+    // Sync camera zoom follow slider
     cameraZoomSlider.value = computedZoom.toFixed(2);
     cameraZoomVal.textContent = computedZoom.toFixed(2) + 'x';
 }
@@ -1315,14 +1405,11 @@ function animateFrame(timestamp) {
             dw, 
             dh
         );
-        ctx.restore();
-    }
-
-    // --- Draw Intermediate Layer: Global Wireframe (Show Calibration) ---
+       // --- Draw Intermediate Layer: Global Wireframe (Show Calibration) ---
     // If "Outline All Countries" is checked, outline the entire world in subtle, theme-matching neon wireframe!
     if (outlineAllToggle && outlineAllToggle.checked && state.geojsonLoaded) {
         state.countries.forEach(country => {
-            if (country !== state.selectedOrigin && country !== state.selectedDest) {
+            if (!state.routeStops.includes(country)) {
                 drawCountryBoundary(
                     ctx, 
                     country, 
@@ -1335,66 +1422,76 @@ function animateFrame(timestamp) {
     }
 
     // --- Draw Selected Countries Pulsing Highlights ---
-    if (state.selectedOrigin) {
+    const activeStopsHighlight = state.routeStops.filter(s => s !== null);
+    activeStopsHighlight.forEach(stop => {
         drawCountryBoundary(
             ctx, 
-            state.selectedOrigin, 
+            stop, 
             state.styles.accentColorDim, 
             state.styles.accentColor, 
             state.styles.accentColorGlow
         );
-    }
-    if (state.selectedDest) {
-        drawCountryBoundary(
-            ctx, 
-            state.selectedDest, 
-            state.styles.accentColorDim, 
-            state.styles.accentColor, 
-            state.styles.accentColorGlow
-        );
-    }
+    });
 
     // --- Draw Top Layer: Flight Path and Sparks ---
-    if (state.selectedOrigin && state.selectedDest) {
-        const c1 = getCountryCentroid(state.selectedOrigin);
-        const c2 = getCountryCentroid(state.selectedDest);
+    if (activeStopsHighlight.length >= 2) {
+        const N = activeStopsHighlight.length - 1;
+        const currentT = state.animation.progress; // 0.0 to 1.0
         
-        const p0 = projectCoords(c1[0], c1[1]);
-        const p2 = projectCoords(c2[0], c2[1]);
-        const p1 = getFlightBezierControlPoint(p0, p2);
+        // Compute which segment the plane is currently on and its local progress segmentT
+        const segmentFloat = currentT * N;
+        let currentSegIndex = Math.floor(segmentFloat);
+        if (currentSegIndex >= N) currentSegIndex = N - 1;
+        const segmentT = segmentFloat - currentSegIndex;
 
-        const currentT = state.animation.progress;
-
-        // Draw planned flight route (dashed, translucent white line)
+        // 1. Draw planned flight route (dashed, translucent white line)
         ctx.save();
-        ctx.beginPath();
-        const tipPtStart = getBezierPoint(p0, p1, p2, currentT);
-        ctx.moveTo(tipPtStart.x, tipPtStart.y);
-        const dashSteps = Math.ceil((1 - currentT) * 100);
-        for (let i = 1; i <= dashSteps; i++) {
-            const t = currentT + (i / dashSteps) * (1 - currentT);
-            const pt = getBezierPoint(p0, p1, p2, t);
-            ctx.lineTo(pt.x, pt.y);
-        }
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
         ctx.lineWidth = 2.2 / state.camera.zoom;
         ctx.setLineDash([8 / state.camera.zoom, 6 / state.camera.zoom]);
-        ctx.stroke();
+
+        for (let seg = 0; seg < N; seg++) {
+            const sDeparture = activeStopsHighlight[seg];
+            const sArrival = activeStopsHighlight[seg + 1];
+            const c1 = getCountryCentroid(sDeparture);
+            const c2 = getCountryCentroid(sArrival);
+            const p0 = projectCoords(c1[0], c1[1]);
+            const p2 = projectCoords(c2[0], c2[1]);
+            const p1 = getFlightBezierControlPoint(p0, p2);
+
+            ctx.beginPath();
+            if (seg < currentSegIndex) {
+                // Fully traveled, don't draw planned line
+                continue;
+            } else if (seg === currentSegIndex) {
+                // Partially traveled, draw from the plane's position (segmentT) to 1.0
+                const startPt = getBezierPoint(p0, p1, p2, segmentT);
+                ctx.moveTo(startPt.x, startPt.y);
+                const dashSteps = Math.ceil((1 - segmentT) * 100);
+                for (let i = 1; i <= dashSteps; i++) {
+                    const t = segmentT + (i / dashSteps) * (1 - segmentT);
+                    const pt = getBezierPoint(p0, p1, p2, t);
+                    ctx.lineTo(pt.x, pt.y);
+                }
+            } else {
+                // Future segment, draw full Bezier planned line
+                ctx.moveTo(p0.x, p0.y);
+                const dashSteps = 100;
+                for (let i = 1; i <= dashSteps; i++) {
+                    const t = i / dashSteps;
+                    const pt = getBezierPoint(p0, p1, p2, t);
+                    ctx.lineTo(pt.x, pt.y);
+                }
+            }
+            ctx.stroke();
+        }
         ctx.restore();
 
         const routeStyle = document.getElementById('trajectory-style')?.value || 'solid';
 
-        // Draw traveled route (glowing color theme line, style selectable)
+        // 2. Draw traveled route (glowing color theme line, style selectable)
         if (currentT > 0.001 && routeStyle !== 'none') {
             ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(p0.x, p0.y);
-            const drawSteps = Math.ceil(currentT * 100);
-            for (let i = 1; i <= drawSteps; i++) {
-                const t = (i / drawSteps) * currentT;
-                const pt = getBezierPoint(p0, p1, p2, t);
-                ctx.lineTo(pt.x, pt.y);
-            }
             ctx.strokeStyle = state.styles.trajectoryColor;
             ctx.lineWidth = 3.5 / state.camera.zoom;
             ctx.shadowColor = state.styles.trajectoryColorGlow;
@@ -1406,22 +1503,51 @@ function animateFrame(timestamp) {
                 ctx.setLineDash([2 / state.camera.zoom, 6 / state.camera.zoom]);
                 ctx.lineCap = 'round';
             }
-            
-            ctx.stroke();
+
+            for (let seg = 0; seg <= currentSegIndex; seg++) {
+                const sDeparture = activeStopsHighlight[seg];
+                const sArrival = activeStopsHighlight[seg + 1];
+                const c1 = getCountryCentroid(sDeparture);
+                const c2 = getCountryCentroid(sArrival);
+                const p0 = projectCoords(c1[0], c1[1]);
+                const p2 = projectCoords(c2[0], c2[1]);
+                const p1 = getFlightBezierControlPoint(p0, p2);
+
+                ctx.beginPath();
+                ctx.moveTo(p0.x, p0.y);
+                
+                const endT = (seg === currentSegIndex) ? segmentT : 1.0;
+                const drawSteps = Math.ceil(endT * 100);
+                for (let i = 1; i <= drawSteps; i++) {
+                    const t = (i / drawSteps) * endT;
+                    const pt = getBezierPoint(p0, p1, p2, t);
+                    ctx.lineTo(pt.x, pt.y);
+                }
+                ctx.stroke();
+            }
             ctx.restore();
         }
 
         const particlesEnabled = document.getElementById('particles-toggle')?.checked !== false;
 
+        // Get coordinates of the plane for drawing
+        const activeDeparture = activeStopsHighlight[currentSegIndex];
+        const activeArrival = activeStopsHighlight[currentSegIndex + 1];
+        const c1 = getCountryCentroid(activeDeparture);
+        const c2 = getCountryCentroid(activeArrival);
+        const p0 = projectCoords(c1[0], c1[1]);
+        const p2 = projectCoords(c2[0], c2[1]);
+        const p1 = getFlightBezierControlPoint(p0, p2);
+
+        // Calculate current tip coordinates and derivative flight angle
+        const tipPt = getBezierPoint(p0, p1, p2, segmentT);
+        const deriv = getBezierDerivative(p0, p1, p2, segmentT);
+        const angle = Math.atan2(deriv.y, deriv.x);
+
         // Update & Render sparks engine trail
         if (particlesEnabled) {
             updateAndDrawParticles(ctx);
         }
-
-        // Calculate current tip coordinates and derivative flight angle
-        const tipPt = getBezierPoint(p0, p1, p2, currentT);
-        const deriv = getBezierDerivative(p0, p1, p2, currentT);
-        const angle = Math.atan2(deriv.y, deriv.x);
 
         // Spawn engine spark particles when playing
         if (particlesEnabled && state.animation.isPlaying && currentT > 0 && currentT < 0.999) {
@@ -1431,9 +1557,6 @@ function animateFrame(timestamp) {
         // --- DRAW Sleek Passenger Airplane Image ---
         ctx.save();
         ctx.translate(tipPt.x, tipPt.y);
-        
-        // The nose of the passenger plane in the provided PNG image points straight UP.
-        // So we rotate by the slope derivative angle + 90 degrees (Math.PI / 2) to align it perfectly along the heading direction!
         ctx.rotate(angle + Math.PI / 2);
         
         ctx.shadowColor = state.styles.trajectoryColorGlow;
@@ -1442,18 +1565,16 @@ function animateFrame(timestamp) {
         // Custom size dependent on camera zoom level to maintain crisp visual scale
         const planeSize = 36 / state.camera.zoom;
 
-        // Check if the custom airplane image is fully loaded, otherwise fall back to dynamic vector model
         if (planeImg.complete && planeImg.naturalWidth !== 0) {
             ctx.drawImage(planeImg, -planeSize / 2, -planeSize / 2, planeSize, planeSize);
         } else {
-            // Backup sleek vector commercial jet model
+            // Backup sleek vector jet model
             ctx.fillStyle = state.styles.trajectoryColor;
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1.0 / state.camera.zoom;
 
-            // Fuselage Body Nose-to-Tail
             ctx.beginPath();
-            ctx.moveTo(14 / state.camera.zoom, 0); // Nose tip
+            ctx.moveTo(14 / state.camera.zoom, 0);
             ctx.quadraticCurveTo(8 / state.camera.zoom, -3.2 / state.camera.zoom, 3 / state.camera.zoom, -3.2 / state.camera.zoom);
             ctx.lineTo(-12 / state.camera.zoom, -3.2 / state.camera.zoom);
             ctx.quadraticCurveTo(-15 / state.camera.zoom, -3.2 / state.camera.zoom, -16 / state.camera.zoom, 0);
@@ -1464,7 +1585,7 @@ function animateFrame(timestamp) {
             ctx.fill();
             ctx.stroke();
 
-            // Main Wing Left
+            // Wing L
             ctx.beginPath();
             ctx.moveTo(1 / state.camera.zoom, -3.2 / state.camera.zoom);
             ctx.lineTo(-8 / state.camera.zoom, -19 / state.camera.zoom);
@@ -1474,7 +1595,7 @@ function animateFrame(timestamp) {
             ctx.fill();
             ctx.stroke();
 
-            // Main Wing Right
+            // Wing R
             ctx.beginPath();
             ctx.moveTo(1 / state.camera.zoom, 3.2 / state.camera.zoom);
             ctx.lineTo(-8 / state.camera.zoom, 19 / state.camera.zoom);
@@ -1484,7 +1605,6 @@ function animateFrame(timestamp) {
             ctx.fill();
             ctx.stroke();
         }
-
         ctx.restore();
 
         // Increment animation progress
@@ -1498,8 +1618,6 @@ function animateFrame(timestamp) {
             if (state.camera.lockToPath) {
                 state.camera.targetX = tipPt.x;
                 state.camera.targetY = tipPt.y;
-                
-                // Directly bind camera target zoom to the interactive camera-zoom slider value!
                 state.camera.targetZoom = parseFloat(cameraZoomSlider.value);
             }
 
@@ -1510,7 +1628,6 @@ function animateFrame(timestamp) {
 
             if (state.animation.progress >= 1.0) {
                 if (isRecording) {
-                    // Stop video capture automatically at final index!
                     state.animation.isPlaying = false;
                     mediaRecorder.stop();
                 } else if (state.animation.loop) {
@@ -1524,12 +1641,8 @@ function animateFrame(timestamp) {
             }
         }
     } else {
-        // Render normal idle active particle engine if any exist
         updateAndDrawParticles(ctx);
     }
-
-    ctx.restore();
-    requestAnimationFrame(animateFrame);
 }
 
 // --- Scrubber & Timeline Updates ---
@@ -1541,20 +1654,37 @@ function updateScrubberUI() {
     timelineFill.style.width = `${pct}%`;
 
     // Dynamic HUD Telemetry calculation (Bottom Left)
-    if (state.selectedOrigin && state.selectedDest) {
+    const activeStops = state.routeStops.filter(s => s !== null);
+    if (activeStops.length >= 2) {
         const remainingDist = Math.max(0, totalDistance * (1 - state.animation.progress));
         hudDist.textContent = `${Math.round(remainingDist).toLocaleString()} km`;
 
-        // Compass Heading mapping during Bezier flight
-        const c1 = getCountryCentroid(state.selectedOrigin);
-        const c2 = getCountryCentroid(state.selectedDest);
+        const N = activeStops.length - 1;
+        const currentT = state.animation.progress;
+        const segmentFloat = currentT * N;
+        let currentSegIndex = Math.floor(segmentFloat);
+        if (currentSegIndex >= N) currentSegIndex = N - 1;
+        const segmentT = segmentFloat - currentSegIndex;
+
+        const currentDeparture = activeStops[currentSegIndex];
+        const currentArrival = activeStops[currentSegIndex + 1];
+        
+        // Update glowing HUD overlays departure/destination names based on active leg!
+        const name1 = currentDeparture.properties.NAME || currentDeparture.properties.ADMIN;
+        const name2 = currentArrival.properties.NAME || currentArrival.properties.ADMIN;
+        hudOrigin.textContent = name1.toUpperCase();
+        hudDest.textContent = name2.toUpperCase();
+
+        // Compass Heading mapping during Bezier flight of active leg segment
+        const c1 = getCountryCentroid(currentDeparture);
+        const c2 = getCountryCentroid(currentArrival);
         const p0 = projectCoords(c1[0], c1[1]);
         const p2 = projectCoords(c2[0], c2[1]);
         const p1 = getFlightBezierControlPoint(p0, p2);
         
-        const deriv = getBezierDerivative(p0, p1, p2, state.animation.progress);
+        const deriv = getBezierDerivative(p0, p1, p2, segmentT);
         
-        // Convert screen Y coordinate space derivative (pointing down) to normal polar compass space
+        // Convert screen Y coordinate space derivative to polar compass space
         let angleDeg = Math.atan2(deriv.x, -deriv.y) * 180 / Math.PI;
         const compHeading = (angleDeg + 360) % 360;
         hudHeading.textContent = `${Math.round(compHeading)}° (${getCompassDirection(compHeading)})`;
@@ -1566,7 +1696,8 @@ function updateScrubberUI() {
 function setupUIEventListeners() {
     // Play/Pause Operations
     playBtn.addEventListener('click', () => {
-        if (!state.selectedOrigin || !state.selectedDest) return;
+        const activeStops = state.routeStops.filter(s => s !== null);
+        if (activeStops.length < 2) return;
         
         state.animation.isPlaying = !state.animation.isPlaying;
         if (state.animation.isPlaying) {
@@ -1613,13 +1744,24 @@ function setupUIEventListeners() {
         }
 
         // Camera track on scrub
-        if (state.camera.lockToPath && state.selectedOrigin && state.selectedDest) {
-            const c1 = getCountryCentroid(state.selectedOrigin);
-            const c2 = getCountryCentroid(state.selectedDest);
+        const activeStops = state.routeStops.filter(s => s !== null);
+        if (state.camera.lockToPath && activeStops.length >= 2) {
+            const N = activeStops.length - 1;
+            const currentT = state.animation.progress;
+            const segmentFloat = currentT * N;
+            let currentSegIndex = Math.floor(segmentFloat);
+            if (currentSegIndex >= N) currentSegIndex = N - 1;
+            const segmentT = segmentFloat - currentSegIndex;
+
+            const sDeparture = activeStops[currentSegIndex];
+            const sArrival = activeStops[currentSegIndex + 1];
+            const c1 = getCountryCentroid(sDeparture);
+            const c2 = getCountryCentroid(sArrival);
             const p0 = projectCoords(c1[0], c1[1]);
             const p2 = projectCoords(c2[0], c2[1]);
             const p1 = getFlightBezierControlPoint(p0, p2);
-            const tipPt = getBezierPoint(p0, p1, p2, state.animation.progress);
+            const tipPt = getBezierPoint(p0, p1, p2, segmentT);
+            
             state.camera.targetX = tipPt.x;
             state.camera.targetY = tipPt.y;
         }
@@ -1640,14 +1782,25 @@ function setupUIEventListeners() {
     cameraLock.addEventListener('change', () => {
         state.camera.lockToPath = cameraLock.checked;
         if (state.camera.lockToPath) {
-            if (state.animation.isPlaying && state.selectedOrigin && state.selectedDest) {
+            const activeStops = state.routeStops.filter(s => s !== null);
+            if (state.animation.isPlaying && activeStops.length >= 2) {
                 // Focus on flight tip
-                const c1 = getCountryCentroid(state.selectedOrigin);
-                const c2 = getCountryCentroid(state.selectedDest);
+                const N = activeStops.length - 1;
+                const currentT = state.animation.progress;
+                const segmentFloat = currentT * N;
+                let currentSegIndex = Math.floor(segmentFloat);
+                if (currentSegIndex >= N) currentSegIndex = N - 1;
+                const segmentT = segmentFloat - currentSegIndex;
+
+                const sDeparture = activeStops[currentSegIndex];
+                const sArrival = activeStops[currentSegIndex + 1];
+                const c1 = getCountryCentroid(sDeparture);
+                const c2 = getCountryCentroid(sArrival);
                 const p0 = projectCoords(c1[0], c1[1]);
                 const p2 = projectCoords(c2[0], c2[1]);
                 const p1 = getFlightBezierControlPoint(p0, p2);
-                const tipPt = getBezierPoint(p0, p1, p2, state.animation.progress);
+                const tipPt = getBezierPoint(p0, p1, p2, segmentT);
+                
                 state.camera.targetX = tipPt.x;
                 state.camera.targetY = tipPt.y;
             } else {
@@ -1655,6 +1808,17 @@ function setupUIEventListeners() {
             }
         }
     });
+
+    // Add Stops Timeline Actions
+    const btnAddStop = document.getElementById('btn-add-stop');
+    if (btnAddStop) {
+        btnAddStop.addEventListener('click', () => {
+            const lastIndex = state.routeStops.length - 1;
+            state.routeStops.splice(lastIndex, 0, null);
+            renderRouteStops();
+            routeUpdated();
+        });
+    }
 
     // Recenter Camera Shortcut
     recenterBtn.addEventListener('click', () => {
@@ -1699,7 +1863,8 @@ function setupUIEventListeners() {
 
     // Camera Focus Zoom Mode Selector
     zoomFramingSelect.addEventListener('change', () => {
-        if (state.selectedOrigin && state.selectedDest) {
+        const activeStops = state.routeStops.filter(s => s !== null);
+        if (activeStops.length >= 2) {
             focusOnFlightPath();
         }
     });
@@ -1736,7 +1901,8 @@ function setupUIEventListeners() {
         if (valYScale) valYScale.textContent = calibrationTarget.yScale.toFixed(3);
         
         // Refresh centroids and telemetry calculations instantly
-        if (state.selectedOrigin && state.selectedDest) {
+        const activeStops = state.routeStops.filter(s => s !== null);
+        if (activeStops.length >= 2) {
             updateScrubberUI();
         }
     };
@@ -1759,8 +1925,8 @@ function setupUIEventListeners() {
 
     // Photoshop Direct Keyboard Shortcuts (Arrow keys & WASD key nudge bindings!)
     window.addEventListener('keydown', (e) => {
-        // Prevent nudges if user is actively entering text inside country search bars
-        if (document.activeElement === originInput || document.activeElement === destInput) {
+        // Prevent nudges if user is actively entering text inside any inputs
+        if (document.activeElement && document.activeElement.tagName === 'INPUT') {
             return;
         }
 
@@ -2045,7 +2211,15 @@ function setupUIEventListeners() {
             effectBlur: imageEffectsTarget.blur,
             effectHue: imageEffectsTarget.hueRotate,
             effectGrayscale: imageEffectsTarget.grayscale,
-            effectInvert: imageEffectsTarget.invert
+            effectInvert: imageEffectsTarget.invert,
+            
+            // Extended Workspace defaults
+            colorTheme: themeSelect.value,
+            trajectoryStyle: document.getElementById('trajectory-style')?.value || 'solid',
+            particlesEnabled: document.getElementById('particles-toggle')?.checked !== false,
+            cameraLock: cameraLock.checked,
+            outlineAll: outlineAllToggle?.checked !== false,
+            cameraZoom: parseFloat(cameraZoomSlider.value) || 0.80
         };
         
         // Browser localStorage fallback
@@ -2063,7 +2237,7 @@ function setupUIEventListeners() {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                showToast("Calibration settings saved to disk!");
+                showToast("Calibration & workspace settings saved to disk!");
             } else {
                 showToast("Saved to local storage. Server error: " + data.message);
             }
@@ -2540,7 +2714,8 @@ function toggleUIControls(disable) {
 }
 
 function startCanvasRecording() {
-    if (!state.selectedOrigin || !state.selectedDest) return;
+    const activeStops = state.routeStops.filter(s => s !== null);
+    if (activeStops.length < 2) return;
 
     isRecording = true;
     recordedChunks = [];
@@ -2572,7 +2747,7 @@ function startCanvasRecording() {
 
     // Instantly snap the camera coordinates to eliminate starting panning lag/slip!
     if (state.camera.lockToPath) {
-        const c1 = getCountryCentroid(state.selectedOrigin);
+        const c1 = getCountryCentroid(activeStops[0]);
         const p0 = projectCoords(c1[0], c1[1]);
         state.camera.targetX = p0.x;
         state.camera.targetY = p0.y;
@@ -2624,12 +2799,16 @@ function startCanvasRecording() {
             const videoUrl = URL.createObjectURL(blob);
             
             // Build dynamic filename using country names
-            const name1 = (state.selectedOrigin.properties.NAME || "origin").replace(/\s+/g, '_');
-            const name2 = (state.selectedDest.properties.NAME || "destination").replace(/\s+/g, '_');
+            let namesStr = "";
+            activeStops.forEach((stop, idx) => {
+                const name = (stop.properties.NAME || stop.properties.ADMIN || `stop_${idx}`).replace(/\s+/g, '_');
+                if (idx > 0) namesStr += "-to-";
+                namesStr += name;
+            });
 
             const dl = document.createElement('a');
             dl.href = videoUrl;
-            dl.download = `aeroglide-flight-${name1}-to-${name2}.webm`;
+            dl.download = `aeroglide-flight-${namesStr}.webm`;
             document.body.appendChild(dl);
             dl.click();
             document.body.removeChild(dl);
@@ -2721,7 +2900,45 @@ function loadCalibrationSettings() {
             if (valYScale) valYScale.textContent = calibrationTarget.yScale.toFixed(3);
             
             syncTransformToolbarUI();
-            console.log("[AeroGlide] Calibration loaded from disk:", calibrationTarget, imageCalibrationTarget, imageEffectsTarget);
+
+            // Load extended workspace defaults
+            if (data.colorTheme !== undefined) {
+                themeSelect.value = data.colorTheme;
+                themeSelect.dispatchEvent(new Event('change'));
+            }
+            if (data.trajectoryStyle !== undefined) {
+                const trajSelect = document.getElementById('trajectory-style');
+                if (trajSelect) {
+                    trajSelect.value = data.trajectoryStyle;
+                    trajSelect.dispatchEvent(new Event('change'));
+                }
+            }
+            if (data.particlesEnabled !== undefined) {
+                const partToggle = document.getElementById('particles-toggle');
+                if (partToggle) {
+                    partToggle.checked = data.particlesEnabled;
+                    partToggle.dispatchEvent(new Event('change'));
+                }
+            }
+            if (data.cameraLock !== undefined) {
+                cameraLock.checked = data.cameraLock;
+                state.camera.lockToPath = data.cameraLock;
+                cameraLock.dispatchEvent(new Event('change'));
+            }
+            if (data.outlineAll !== undefined) {
+                if (outlineAllToggle) {
+                    outlineAllToggle.checked = data.outlineAll;
+                    outlineAllToggle.dispatchEvent(new Event('change'));
+                }
+            }
+            if (data.cameraZoom !== undefined) {
+                cameraZoomSlider.value = data.cameraZoom.toFixed(2);
+                cameraZoomVal.textContent = data.cameraZoom.toFixed(2) + 'x';
+                state.camera.targetZoom = data.cameraZoom;
+                state.camera.zoom = data.cameraZoom;
+            }
+
+            console.log("[AeroGlide] Calibration & workspace defaults loaded from disk:", calibrationTarget, imageCalibrationTarget, imageEffectsTarget);
         })
         .catch(err => {
             console.warn("[AeroGlide] Failed to fetch server settings, reading browser local cache:", err);
@@ -2770,6 +2987,43 @@ function loadCalibrationSettings() {
                 if (valYScale) valYScale.textContent = calibrationTarget.yScale.toFixed(3);
                 
                 syncTransformToolbarUI();
+
+                // Load extended workspace defaults
+                if (data.colorTheme !== undefined) {
+                    themeSelect.value = data.colorTheme;
+                    themeSelect.dispatchEvent(new Event('change'));
+                }
+                if (data.trajectoryStyle !== undefined) {
+                    const trajSelect = document.getElementById('trajectory-style');
+                    if (trajSelect) {
+                        trajSelect.value = data.trajectoryStyle;
+                        trajSelect.dispatchEvent(new Event('change'));
+                    }
+                }
+                if (data.particlesEnabled !== undefined) {
+                    const partToggle = document.getElementById('particles-toggle');
+                    if (partToggle) {
+                        partToggle.checked = data.particlesEnabled;
+                        partToggle.dispatchEvent(new Event('change'));
+                    }
+                }
+                if (data.cameraLock !== undefined) {
+                    cameraLock.checked = data.cameraLock;
+                    state.camera.lockToPath = data.cameraLock;
+                    cameraLock.dispatchEvent(new Event('change'));
+                }
+                if (data.outlineAll !== undefined) {
+                    if (outlineAllToggle) {
+                        outlineAllToggle.checked = data.outlineAll;
+                        outlineAllToggle.dispatchEvent(new Event('change'));
+                    }
+                }
+                if (data.cameraZoom !== undefined) {
+                    cameraZoomSlider.value = data.cameraZoom.toFixed(2);
+                    cameraZoomVal.textContent = data.cameraZoom.toFixed(2) + 'x';
+                    state.camera.targetZoom = data.cameraZoom;
+                    state.camera.zoom = data.cameraZoom;
+                }
             }
         });
 }

@@ -63,26 +63,17 @@
 
             <div class="sidebar-content">
                 <!-- Country Selection Section -->
+                <!-- Country Selection Section -->
                 <div class="section-card">
-                    <h2><span class="sec-icon">🗺</span> Select Route</h2>
+                    <h2><span class="sec-icon">🗺</span> Select Flight Route</h2>
                     
-                    <div class="input-group">
-                        <label for="origin-input">Origin Country</label>
-                        <div class="autocomplete-container">
-                            <input type="text" id="origin-input" placeholder="Search departure country..." autocomplete="off">
-                            <button id="clear-origin" class="clear-input-btn hidden">&times;</button>
-                            <div id="origin-suggestions" class="suggestions-dropdown hidden"></div>
-                        </div>
+                    <div id="route-stops-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                        <!-- Stops will be rendered here dynamically -->
                     </div>
 
-                    <div class="input-group">
-                        <label for="destination-input">Destination Country</label>
-                        <div class="autocomplete-container">
-                            <input type="text" id="destination-input" placeholder="Search arrival country..." autocomplete="off">
-                            <button id="clear-destination" class="clear-input-btn hidden">&times;</button>
-                            <div id="destination-suggestions" class="suggestions-dropdown hidden"></div>
-                        </div>
-                    </div>
+                    <button id="btn-add-stop" class="secondary-btn" style="padding: 8px; font-size: 11px; width: 100%; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px;" title="Add a Stop to Route">
+                        ➕ Add Destination Stop
+                    </button>
                 </div>
 
                 <!-- Flight Statistics (Revealed when route is loaded) -->
