@@ -204,6 +204,10 @@ const hudDist = document.getElementById('hud-dist');
 const hudHeading = document.getElementById('hud-heading');
 const recordingOverlay = document.getElementById('recording-overlay');
 const recordingProgress = document.getElementById('rec-progress');
+const recordingPrepControls = document.getElementById('recording-prep-controls');
+const recordingActiveStatus = document.getElementById('recording-active-status');
+const btnStartActualRecording = document.getElementById('btn-start-actual-recording');
+const btnCancelRecording = document.getElementById('btn-cancel-recording');
 
 const recenterBtn = document.getElementById('recenter-btn');
 const focusFlightBtn = document.getElementById('focus-countries-btn');
@@ -2558,6 +2562,34 @@ function setupUIEventListeners() {
         startCanvasRecording();
     });
 
+    if (btnStartActualRecording) {
+        btnStartActualRecording.addEventListener('click', () => {
+            if (recordingPrepControls) recordingPrepControls.classList.add('hidden');
+            if (recordingActiveStatus) recordingActiveStatus.classList.remove('hidden');
+            triggerRecordingCapture();
+        });
+    }
+
+    if (btnCancelRecording) {
+        btnCancelRecording.addEventListener('click', () => {
+            isRecording = false;
+            recordingOverlay.classList.add('hidden');
+            
+            // Restore responsive canvas physical buffer dimensions
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            toggleUIControls(false);
+            
+            // Recalculate camera zoom framing for responsive screen
+            focusOnFlightPath();
+            
+            state.animation.isPlaying = false;
+            playBtn.innerHTML = '<span class="btn-icon">▶</span> Play';
+            statusVal.textContent = "Ready";
+        });
+    }
+
     // Advanced Calibration Fine-Tuning Buttons (+ and -) with Press-and-Hold Autorepeat
     document.querySelectorAll('.finetune-btn').forEach(btn => {
         let repeatTimeout = null;
@@ -2725,10 +2757,6 @@ function startCanvasRecording() {
     isRecording = true;
     recordedChunks = [];
     
-    // Store original responsive physical buffer sizes
-    const originalWidth = canvas.width;
-    const originalHeight = canvas.height;
-    
     // Temporarily lock physical canvas buffer to Full HD (1920x1080) for high-resolution video output
     canvas.width = 1920;
     canvas.height = 1080;
@@ -2737,6 +2765,10 @@ function startCanvasRecording() {
     toggleUIControls(true);
     recordingProgress.textContent = '0%';
     recordingOverlay.classList.remove('hidden');
+
+    // Show preparation banner controls, hide active recording status
+    if (recordingPrepControls) recordingPrepControls.classList.remove('hidden');
+    if (recordingActiveStatus) recordingActiveStatus.classList.add('hidden');
 
     // Setup perfect start framing for the new 1920x1080 coordinates space
     state.animation.isPlaying = false;
@@ -2765,9 +2797,17 @@ function startCanvasRecording() {
         state.camera.x = state.camera.targetX;
         state.camera.y = state.camera.targetY;
         state.camera.zoom = state.camera.targetZoom;
+        state.camera.targetZoom = state.camera.targetZoom;
     }
+}
 
-    // A small buffer delay of 950ms to let the camera pan smoothly to starting coordinates
+function triggerRecordingCapture() {
+    const activeStops = state.routeStops.filter(s => s !== null);
+    if (activeStops.length < 2) return;
+
+    recordedChunks = [];
+    
+    // A small delay of 150ms to allow UI elements to transition/hide smoothly
     setTimeout(() => {
         // Capture canvas rendering stream at 60fps
         const stream = canvas.captureStream(60);
@@ -2847,8 +2887,7 @@ function startCanvasRecording() {
         state.animation.isPlaying = true;
         playBtn.innerHTML = '<span class="btn-icon">⏸</span> Pause';
         statusVal.textContent = "Recording...";
-        
-    }, 950);
+    }, 150);
 }
 
 // --- Load Calibration Settings from server on boot ---
