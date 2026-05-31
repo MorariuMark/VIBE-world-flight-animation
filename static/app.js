@@ -1405,6 +1405,8 @@ function animateFrame(timestamp) {
             dw, 
             dh
         );
+        ctx.restore();
+    }
        // --- Draw Intermediate Layer: Global Wireframe (Show Calibration) ---
     // If "Outline All Countries" is checked, outline the entire world in subtle, theme-matching neon wireframe!
     if (outlineAllToggle && outlineAllToggle.checked && state.geojsonLoaded) {
@@ -1643,6 +1645,9 @@ function animateFrame(timestamp) {
     } else {
         updateAndDrawParticles(ctx);
     }
+
+    ctx.restore();
+    requestAnimationFrame(animateFrame);
 }
 
 // --- Scrubber & Timeline Updates ---

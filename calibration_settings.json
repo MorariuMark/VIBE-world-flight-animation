@@ -1,7 +1,7 @@
 {
-    "xOffset": 1920,
-    "yOffset": 1070,
-    "xScale": 11.9,
+    "xOffset": 1923.5,
+    "yOffset": 1078.9,
+    "xScale": 11.972,
     "yScale": 11.9,
     "rotation": 0,
     "skewX": 0.25,
@@ -20,5 +20,11 @@
     "effectBlur": 0,
     "effectHue": 0,
     "effectGrayscale": 0,
-    "effectInvert": 0
+    "effectInvert": 0,
+    "colorTheme": "red",
+    "trajectoryStyle": "solid",
+    "particlesEnabled": true,
+    "cameraLock": false,
+    "outlineAll": true,
+    "cameraZoom": 2.05
 }
