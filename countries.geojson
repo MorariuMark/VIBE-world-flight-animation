@@ -76232,6 +76232,1383 @@
                     ]
                 ]
             }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Andorra",
+                "SOV_A3": "AND",
+                "ADMIN": "Andorra",
+                "ADM0_A3": "AND",
+                "NAME": "Andorra",
+                "NAME_LONG": "Andorra",
+                "ISO_A2": "AD",
+                "ISO_A3": "AND",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                1.4468,
+                42.4313,
+                1.5968,
+                42.581300000000006
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            1.4468,
+                            42.4313
+                        ],
+                        [
+                            1.5968,
+                            42.4313
+                        ],
+                        [
+                            1.5968,
+                            42.581300000000006
+                        ],
+                        [
+                            1.4468,
+                            42.581300000000006
+                        ],
+                        [
+                            1.4468,
+                            42.4313
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Antigua and Barbuda",
+                "SOV_A3": "ATG",
+                "ADMIN": "Antigua and Barbuda",
+                "ADM0_A3": "ATG",
+                "NAME": "Antigua and Barbuda",
+                "NAME_LONG": "Antigua and Barbuda",
+                "ISO_A2": "AG",
+                "ISO_A3": "ATG",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -61.9214,
+                16.9358,
+                -61.6714,
+                17.1858
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -61.9214,
+                            16.9358
+                        ],
+                        [
+                            -61.6714,
+                            16.9358
+                        ],
+                        [
+                            -61.6714,
+                            17.1858
+                        ],
+                        [
+                            -61.9214,
+                            17.1858
+                        ],
+                        [
+                            -61.9214,
+                            16.9358
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Bahrain",
+                "SOV_A3": "BHR",
+                "ADMIN": "Bahrain",
+                "ADM0_A3": "BHR",
+                "NAME": "Bahrain",
+                "NAME_LONG": "Bahrain",
+                "ISO_A2": "BH",
+                "ISO_A3": "BHR",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                50.425,
+                25.9417,
+                50.675,
+                26.1917
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            50.425,
+                            25.9417
+                        ],
+                        [
+                            50.675,
+                            25.9417
+                        ],
+                        [
+                            50.675,
+                            26.1917
+                        ],
+                        [
+                            50.425,
+                            26.1917
+                        ],
+                        [
+                            50.425,
+                            25.9417
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Barbados",
+                "SOV_A3": "BRB",
+                "ADMIN": "Barbados",
+                "ADM0_A3": "BRB",
+                "NAME": "Barbados",
+                "NAME_LONG": "Barbados",
+                "ISO_A2": "BB",
+                "ISO_A3": "BRB",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -59.6682,
+                13.0689,
+                -59.4182,
+                13.3189
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -59.6682,
+                            13.0689
+                        ],
+                        [
+                            -59.4182,
+                            13.0689
+                        ],
+                        [
+                            -59.4182,
+                            13.3189
+                        ],
+                        [
+                            -59.6682,
+                            13.3189
+                        ],
+                        [
+                            -59.6682,
+                            13.0689
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Cabo Verde",
+                "SOV_A3": "CPV",
+                "ADMIN": "Cabo Verde",
+                "ADM0_A3": "CPV",
+                "NAME": "Cabo Verde",
+                "NAME_LONG": "Cabo Verde",
+                "ISO_A2": "CV",
+                "ISO_A3": "CPV",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -24.1382,
+                15.877099999999999,
+                -23.8882,
+                16.1271
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -24.1382,
+                            15.877099999999999
+                        ],
+                        [
+                            -23.8882,
+                            15.877099999999999
+                        ],
+                        [
+                            -23.8882,
+                            16.1271
+                        ],
+                        [
+                            -24.1382,
+                            16.1271
+                        ],
+                        [
+                            -24.1382,
+                            15.877099999999999
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Comoros",
+                "SOV_A3": "COM",
+                "ADMIN": "Comoros",
+                "ADM0_A3": "COM",
+                "NAME": "Comoros",
+                "NAME_LONG": "Comoros",
+                "ISO_A2": "KM",
+                "ISO_A3": "COM",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                43.7472,
+                -12.0,
+                43.9972,
+                -11.75
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            43.7472,
+                            -12.0
+                        ],
+                        [
+                            43.9972,
+                            -12.0
+                        ],
+                        [
+                            43.9972,
+                            -11.75
+                        ],
+                        [
+                            43.7472,
+                            -11.75
+                        ],
+                        [
+                            43.7472,
+                            -12.0
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Grenada",
+                "SOV_A3": "GRD",
+                "ADMIN": "Grenada",
+                "ADM0_A3": "GRD",
+                "NAME": "Grenada",
+                "NAME_LONG": "Grenada",
+                "ISO_A2": "GD",
+                "ISO_A3": "GRD",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -61.804,
+                11.9915,
+                -61.554,
+                12.2415
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -61.804,
+                            11.9915
+                        ],
+                        [
+                            -61.554,
+                            11.9915
+                        ],
+                        [
+                            -61.554,
+                            12.2415
+                        ],
+                        [
+                            -61.804,
+                            12.2415
+                        ],
+                        [
+                            -61.804,
+                            11.9915
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Kiribati",
+                "SOV_A3": "KIR",
+                "ADMIN": "Kiribati",
+                "ADM0_A3": "KIR",
+                "NAME": "Kiribati",
+                "NAME_LONG": "Kiribati",
+                "ISO_A2": "KI",
+                "ISO_A3": "KIR",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -168.90900000000002,
+                -3.5454,
+                -168.559,
+                -3.1954000000000002
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -168.90900000000002,
+                            -3.5454
+                        ],
+                        [
+                            -168.559,
+                            -3.5454
+                        ],
+                        [
+                            -168.559,
+                            -3.1954000000000002
+                        ],
+                        [
+                            -168.90900000000002,
+                            -3.1954000000000002
+                        ],
+                        [
+                            -168.90900000000002,
+                            -3.5454
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Liechtenstein",
+                "SOV_A3": "LIE",
+                "ADMIN": "Liechtenstein",
+                "ADM0_A3": "LIE",
+                "NAME": "Liechtenstein",
+                "NAME_LONG": "Liechtenstein",
+                "ISO_A2": "LI",
+                "ISO_A3": "LIE",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                9.4465,
+                47.0665,
+                9.596499999999999,
+                47.2165
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            9.4465,
+                            47.0665
+                        ],
+                        [
+                            9.596499999999999,
+                            47.0665
+                        ],
+                        [
+                            9.596499999999999,
+                            47.2165
+                        ],
+                        [
+                            9.4465,
+                            47.2165
+                        ],
+                        [
+                            9.4465,
+                            47.0665
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Maldives",
+                "SOV_A3": "MDV",
+                "ADMIN": "Maldives",
+                "ADM0_A3": "MDV",
+                "NAME": "Maldives",
+                "NAME_LONG": "Maldives",
+                "ISO_A2": "MV",
+                "ISO_A3": "MDV",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                73.0957,
+                3.0778,
+                73.3457,
+                3.3278
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            73.0957,
+                            3.0778
+                        ],
+                        [
+                            73.3457,
+                            3.0778
+                        ],
+                        [
+                            73.3457,
+                            3.3278
+                        ],
+                        [
+                            73.0957,
+                            3.3278
+                        ],
+                        [
+                            73.0957,
+                            3.0778
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Malta",
+                "SOV_A3": "MLT",
+                "ADMIN": "Malta",
+                "ADM0_A3": "MLT",
+                "NAME": "Malta",
+                "NAME_LONG": "Malta",
+                "ISO_A2": "MT",
+                "ISO_A3": "MLT",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                14.300400000000002,
+                35.8625,
+                14.4504,
+                36.0125
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            14.300400000000002,
+                            35.8625
+                        ],
+                        [
+                            14.4504,
+                            35.8625
+                        ],
+                        [
+                            14.4504,
+                            36.0125
+                        ],
+                        [
+                            14.300400000000002,
+                            36.0125
+                        ],
+                        [
+                            14.300400000000002,
+                            35.8625
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Marshall Islands",
+                "SOV_A3": "MHL",
+                "ADMIN": "Marshall Islands",
+                "ADM0_A3": "MHL",
+                "NAME": "Marshall Islands",
+                "NAME_LONG": "Marshall Islands",
+                "ISO_A2": "MH",
+                "ISO_A3": "MHL",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                171.0595,
+                7.0065,
+                171.3095,
+                7.2565
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            171.0595,
+                            7.0065
+                        ],
+                        [
+                            171.3095,
+                            7.0065
+                        ],
+                        [
+                            171.3095,
+                            7.2565
+                        ],
+                        [
+                            171.0595,
+                            7.2565
+                        ],
+                        [
+                            171.0595,
+                            7.0065
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Mauritius",
+                "SOV_A3": "MUS",
+                "ADMIN": "Mauritius",
+                "ADM0_A3": "MUS",
+                "NAME": "Mauritius",
+                "NAME_LONG": "Mauritius",
+                "ISO_A2": "MU",
+                "ISO_A3": "MUS",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                57.4272,
+                -20.4734,
+                57.6772,
+                -20.2234
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            57.4272,
+                            -20.4734
+                        ],
+                        [
+                            57.6772,
+                            -20.4734
+                        ],
+                        [
+                            57.6772,
+                            -20.2234
+                        ],
+                        [
+                            57.4272,
+                            -20.2234
+                        ],
+                        [
+                            57.4272,
+                            -20.4734
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Micronesia",
+                "SOV_A3": "FSM",
+                "ADMIN": "Micronesia",
+                "ADM0_A3": "FSM",
+                "NAME": "Micronesia",
+                "NAME_LONG": "Micronesia",
+                "ISO_A2": "FM",
+                "ISO_A3": "FSM",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                150.4008,
+                7.2756,
+                150.70080000000002,
+                7.5756000000000006
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            150.4008,
+                            7.2756
+                        ],
+                        [
+                            150.70080000000002,
+                            7.2756
+                        ],
+                        [
+                            150.70080000000002,
+                            7.5756000000000006
+                        ],
+                        [
+                            150.4008,
+                            7.5756000000000006
+                        ],
+                        [
+                            150.4008,
+                            7.2756
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Monaco",
+                "SOV_A3": "MCO",
+                "ADMIN": "Monaco",
+                "ADM0_A3": "MCO",
+                "NAME": "Monaco",
+                "NAME_LONG": "Monaco",
+                "ISO_A2": "MC",
+                "ISO_A3": "MCO",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                7.3846,
+                43.6984,
+                7.4646,
+                43.7784
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            7.3846,
+                            43.6984
+                        ],
+                        [
+                            7.4646,
+                            43.6984
+                        ],
+                        [
+                            7.4646,
+                            43.7784
+                        ],
+                        [
+                            7.3846,
+                            43.7784
+                        ],
+                        [
+                            7.3846,
+                            43.6984
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Nauru",
+                "SOV_A3": "NRU",
+                "ADMIN": "Nauru",
+                "ADM0_A3": "NRU",
+                "NAME": "Nauru",
+                "NAME_LONG": "Nauru",
+                "ISO_A2": "NR",
+                "ISO_A3": "NRU",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                166.8565,
+                -0.5978,
+                167.0065,
+                -0.44780000000000003
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            166.8565,
+                            -0.5978
+                        ],
+                        [
+                            167.0065,
+                            -0.5978
+                        ],
+                        [
+                            167.0065,
+                            -0.44780000000000003
+                        ],
+                        [
+                            166.8565,
+                            -0.44780000000000003
+                        ],
+                        [
+                            166.8565,
+                            -0.5978
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Palau",
+                "SOV_A3": "PLW",
+                "ADMIN": "Palau",
+                "ADM0_A3": "PLW",
+                "NAME": "Palau",
+                "NAME_LONG": "Palau",
+                "ISO_A2": "PW",
+                "ISO_A3": "PLW",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                134.4575,
+                7.39,
+                134.7075,
+                7.64
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            134.4575,
+                            7.39
+                        ],
+                        [
+                            134.7075,
+                            7.39
+                        ],
+                        [
+                            134.7075,
+                            7.64
+                        ],
+                        [
+                            134.4575,
+                            7.64
+                        ],
+                        [
+                            134.4575,
+                            7.39
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Saint Kitts and Nevis",
+                "SOV_A3": "KNA",
+                "ADMIN": "Saint Kitts and Nevis",
+                "ADM0_A3": "KNA",
+                "NAME": "Saint Kitts and Nevis",
+                "NAME_LONG": "Saint Kitts and Nevis",
+                "ISO_A2": "KN",
+                "ISO_A3": "KNA",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -62.908,
+                17.2328,
+                -62.658,
+                17.4828
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -62.908,
+                            17.2328
+                        ],
+                        [
+                            -62.658,
+                            17.2328
+                        ],
+                        [
+                            -62.658,
+                            17.4828
+                        ],
+                        [
+                            -62.908,
+                            17.4828
+                        ],
+                        [
+                            -62.908,
+                            17.2328
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Saint Lucia",
+                "SOV_A3": "LCA",
+                "ADMIN": "Saint Lucia",
+                "ADM0_A3": "LCA",
+                "NAME": "Saint Lucia",
+                "NAME_LONG": "Saint Lucia",
+                "ISO_A2": "LC",
+                "ISO_A3": "LCA",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -61.1039,
+                13.7844,
+                -60.8539,
+                14.0344
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -61.1039,
+                            13.7844
+                        ],
+                        [
+                            -60.8539,
+                            13.7844
+                        ],
+                        [
+                            -60.8539,
+                            14.0344
+                        ],
+                        [
+                            -61.1039,
+                            14.0344
+                        ],
+                        [
+                            -61.1039,
+                            13.7844
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Saint Vincent and the Grenadines",
+                "SOV_A3": "VCT",
+                "ADMIN": "Saint Vincent and the Grenadines",
+                "ADM0_A3": "VCT",
+                "NAME": "Saint Vincent and the Grenadines",
+                "NAME_LONG": "Saint Vincent and the Grenadines",
+                "ISO_A2": "VC",
+                "ISO_A3": "VCT",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -61.4122,
+                12.8593,
+                -61.1622,
+                13.1093
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -61.4122,
+                            12.8593
+                        ],
+                        [
+                            -61.1622,
+                            12.8593
+                        ],
+                        [
+                            -61.1622,
+                            13.1093
+                        ],
+                        [
+                            -61.4122,
+                            13.1093
+                        ],
+                        [
+                            -61.4122,
+                            12.8593
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Samoa",
+                "SOV_A3": "WSM",
+                "ADMIN": "Samoa",
+                "ADM0_A3": "WSM",
+                "NAME": "Samoa",
+                "NAME_LONG": "Samoa",
+                "ISO_A2": "WS",
+                "ISO_A3": "WSM",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -172.2296,
+                -13.884,
+                -171.9796,
+                -13.634
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -172.2296,
+                            -13.884
+                        ],
+                        [
+                            -171.9796,
+                            -13.884
+                        ],
+                        [
+                            -171.9796,
+                            -13.634
+                        ],
+                        [
+                            -172.2296,
+                            -13.634
+                        ],
+                        [
+                            -172.2296,
+                            -13.884
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "San Marino",
+                "SOV_A3": "SMR",
+                "ADMIN": "San Marino",
+                "ADM0_A3": "SMR",
+                "NAME": "San Marino",
+                "NAME_LONG": "San Marino",
+                "ISO_A2": "SM",
+                "ISO_A3": "SMR",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                12.382800000000001,
+                43.867399999999996,
+                12.5328,
+                44.0174
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            12.382800000000001,
+                            43.867399999999996
+                        ],
+                        [
+                            12.5328,
+                            43.867399999999996
+                        ],
+                        [
+                            12.5328,
+                            44.0174
+                        ],
+                        [
+                            12.382800000000001,
+                            44.0174
+                        ],
+                        [
+                            12.382800000000001,
+                            43.867399999999996
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Sao Tome and Principe",
+                "SOV_A3": "STP",
+                "ADMIN": "Sao Tome and Principe",
+                "ADM0_A3": "STP",
+                "NAME": "Sao Tome and Principe",
+                "NAME_LONG": "Sao Tome and Principe",
+                "ISO_A2": "ST",
+                "ISO_A3": "STP",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                6.4881,
+                0.06140000000000001,
+                6.7381,
+                0.3114
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            6.4881,
+                            0.06140000000000001
+                        ],
+                        [
+                            6.7381,
+                            0.06140000000000001
+                        ],
+                        [
+                            6.7381,
+                            0.3114
+                        ],
+                        [
+                            6.4881,
+                            0.3114
+                        ],
+                        [
+                            6.4881,
+                            0.06140000000000001
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Seychelles",
+                "SOV_A3": "SYC",
+                "ADMIN": "Seychelles",
+                "ADM0_A3": "SYC",
+                "NAME": "Seychelles",
+                "NAME_LONG": "Seychelles",
+                "ISO_A2": "SC",
+                "ISO_A3": "SYC",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                55.367,
+                -4.8046,
+                55.617,
+                -4.5546
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            55.367,
+                            -4.8046
+                        ],
+                        [
+                            55.617,
+                            -4.8046
+                        ],
+                        [
+                            55.617,
+                            -4.5546
+                        ],
+                        [
+                            55.367,
+                            -4.5546
+                        ],
+                        [
+                            55.367,
+                            -4.8046
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Tonga",
+                "SOV_A3": "TON",
+                "ADMIN": "Tonga",
+                "ADM0_A3": "TON",
+                "NAME": "Tonga",
+                "NAME_LONG": "Tonga",
+                "ISO_A2": "TO",
+                "ISO_A3": "TON",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                -175.3232,
+                -21.3039,
+                -175.0732,
+                -21.0539
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -175.3232,
+                            -21.3039
+                        ],
+                        [
+                            -175.0732,
+                            -21.3039
+                        ],
+                        [
+                            -175.0732,
+                            -21.0539
+                        ],
+                        [
+                            -175.3232,
+                            -21.0539
+                        ],
+                        [
+                            -175.3232,
+                            -21.3039
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Tuvalu",
+                "SOV_A3": "TUV",
+                "ADMIN": "Tuvalu",
+                "ADM0_A3": "TUV",
+                "NAME": "Tuvalu",
+                "NAME_LONG": "Tuvalu",
+                "ISO_A2": "TV",
+                "ISO_A3": "TUV",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                177.5243,
+                -7.2345,
+                177.7743,
+                -6.9845
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            177.5243,
+                            -7.2345
+                        ],
+                        [
+                            177.7743,
+                            -7.2345
+                        ],
+                        [
+                            177.7743,
+                            -6.9845
+                        ],
+                        [
+                            177.5243,
+                            -6.9845
+                        ],
+                        [
+                            177.5243,
+                            -7.2345
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "featurecla": "Admin-0 country",
+                "scalerank": 3,
+                "LABELRANK": 6,
+                "SOVEREIGNT": "Vatican City",
+                "SOV_A3": "VAT",
+                "ADMIN": "Vatican City",
+                "ADM0_A3": "VAT",
+                "NAME": "Vatican City",
+                "NAME_LONG": "Vatican City",
+                "ISO_A2": "VA",
+                "ISO_A3": "VAT",
+                "WIKIDATAID": "",
+                "TINY": 1
+            },
+            "bbox": [
+                12.4284,
+                41.877900000000004,
+                12.4784,
+                41.9279
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            12.4284,
+                            41.877900000000004
+                        ],
+                        [
+                            12.4784,
+                            41.877900000000004
+                        ],
+                        [
+                            12.4784,
+                            41.9279
+                        ],
+                        [
+                            12.4284,
+                            41.9279
+                        ],
+                        [
+                            12.4284,
+                            41.877900000000004
+                        ]
+                    ]
+                ]
+            }
         }
     ],
     "bbox": [
